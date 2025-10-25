@@ -209,7 +209,7 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     return () => clearInterval(phaseInterval)
   }, [animationPhase, isMounted])
 
-  // Handle Enter key
+  // Handle Enter key and click anywhere
   useEffect(() => {
     if (!isMounted) return
     
@@ -220,8 +220,18 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
       }
     }
 
+    const handleClick = () => {
+      setIsVisible(false)
+      setTimeout(() => onEnter(), 500) // Small delay for smooth transition
+    }
+
     window.addEventListener("keydown", handleKeyPress)
-    return () => window.removeEventListener("keydown", handleKeyPress)
+    window.addEventListener("click", handleClick)
+    
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress)
+      window.removeEventListener("click", handleClick)
+    }
   }, [onEnter, isMounted])
 
 
@@ -304,7 +314,7 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
       {showPrompt && (
         <div className="flex items-center space-x-2 text-green-400 animate-fade-in">
           <span className="animate-pulse text-green-400 text-xl">█</span>
-          <span className="animate-pulse text-lg">Press ENTER to access terminal</span>
+          <span className="animate-pulse text-lg">Press ENTER or click anywhere to access terminal</span>
           <span className="animate-pulse text-green-400 text-xl">█</span>
         </div>
       )}
