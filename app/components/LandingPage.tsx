@@ -12,8 +12,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
   const [showPrompt, setShowPrompt] = useState(false)
   const [animationPhase, setAnimationPhase] = useState(0) // 0: typewriter, 1: shine, 2: glow, 3: pulse, 4: wave
   const [isMounted, setIsMounted] = useState(false)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  const [cursorTrail, setCursorTrail] = useState<Array<{x: number, y: number, char: string, id: number}>>([])
 
   // Complete "Umar Darsot" ASCII art with space
   const fullNameASCII = [
@@ -133,44 +131,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     setIsMounted(true)
   }, [])
 
-  // Mouse tracking and cursor trail
-  useEffect(() => {
-    if (!isMounted) return
-
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY })
-      
-      // Add character to trail
-      const chars = ['0', '1', '█', '░', '▓', '▒', '■', '□', '●', '○']
-      const randomChar = chars[Math.floor(Math.random() * chars.length)]
-      
-      setCursorTrail(prev => {
-        const newTrail = [...prev, {
-          x: e.clientX,
-          y: e.clientY,
-          char: randomChar,
-          id: Date.now() + Math.random()
-        }]
-        
-        // Keep only last 50 characters
-        return newTrail.slice(-50)
-      })
-    }
-
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [isMounted])
-
-  // Clean up old trail characters
-  useEffect(() => {
-    if (!isMounted) return
-
-    const cleanupInterval = setInterval(() => {
-      setCursorTrail(prev => prev.filter(item => Date.now() - item.id < 5000))
-    }, 100)
-
-    return () => clearInterval(cleanupInterval)
-  }, [isMounted])
 
   // Show prompt after a delay
   useEffect(() => {
@@ -308,85 +268,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
         </div>
       )}
 
-      {/* Enhanced floating particles effect */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(30)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-green-500 opacity-40 animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 3}s`
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Cursor trail effect */}
-      <div className="absolute inset-0 pointer-events-none">
-        {cursorTrail.map((item) => (
-          <div
-            key={item.id}
-            className="absolute text-green-400 text-sm font-mono animate-fade-in"
-            style={{
-              left: item.x,
-              top: item.y,
-              transform: 'translate(-50%, -50%)',
-              opacity: 0.8,
-              zIndex: 1000
-            }}
-          >
-            {item.char}
-          </div>
-        ))}
-      </div>
-
-      {/* Holographic grid overlay */}
-      <div className="absolute inset-0 pointer-events-none opacity-10">
-        <div className="w-full h-full bg-gradient-to-br from-transparent via-green-400/5 to-transparent"></div>
-        <div className="absolute inset-0" style={{
-          backgroundImage: `
-            linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px'
-        }}></div>
-      </div>
-
-      {/* Matrix-style rain effect */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute text-green-500 opacity-30 text-xs animate-matrix-rain"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${3 + Math.random() * 2}s`
-            }}
-          >
-            {String.fromCharCode(0x30A0 + Math.random() * 96)}
-          </div>
-        ))}
-      </div>
-
-      {/* Glowing orbs effect */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 bg-green-400 rounded-full opacity-20 animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 4}s`,
-              animationDuration: `${4 + Math.random() * 2}s`
-            }}
-          />
-        ))}
-      </div>
 
     </div>
   )
