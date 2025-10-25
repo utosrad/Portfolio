@@ -36,6 +36,7 @@ export default function TerminalPortfolio() {
   const [commandHistory, setCommandHistory] = useState<string[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [isTyping, setIsTyping] = useState(false)
+  const [cursorTrail, setCursorTrail] = useState<Array<{id: number, x: number, y: number, char: string, color: string, timestamp: number}>>([])
   const inputRef = useRef<HTMLInputElement>(null)
   const terminalRef = useRef<HTMLDivElement>(null)
 
@@ -222,6 +223,38 @@ export default function TerminalPortfolio() {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight
     }
   }, [history])
+
+  // Handle cursor trail effect
+  useEffect(() => {
+    let trailId = 0
+    const colors = ['text-green-400', 'text-blue-400', 'text-yellow-400', 'text-red-400', 'text-purple-400', 'text-cyan-400', 'text-orange-400', 'text-pink-400']
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      const char = Math.random() > 0.5 ? '1' : '0'
+      const color = colors[Math.floor(Math.random() * colors.length)]
+      const newTrail = {
+        id: trailId++,
+        x: e.clientX,
+        y: e.clientY,
+        char: char,
+        color: color,
+        timestamp: Date.now()
+      }
+      
+      setCursorTrail(prev => [...prev, newTrail])
+      
+      // Remove old trail elements after 3 seconds
+      setTimeout(() => {
+        setCursorTrail(prev => prev.filter(item => item.id !== newTrail.id))
+      }, 3000)
+    }
+
+    window.addEventListener("mousemove", handleMouseMove)
+    
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+    }
+  }, [])
 
   // Function to add command output instantly (no typing animation)
   const addInstantOutput = (cmd: string, output: string[]) => {
@@ -918,6 +951,21 @@ export default function TerminalPortfolio() {
           </p>
         </div>
       </div>
+
+      {/* Cursor Trail Effect */}
+      {cursorTrail.map((trail) => (
+        <div
+          key={trail.id}
+          className={`fixed pointer-events-none text-sm font-mono z-50 animate-fade-in ${trail.color}`}
+          style={{
+            left: trail.x,
+            top: trail.y,
+            transform: 'translate(-50%, -50%)'
+          }}
+        >
+          {trail.char}
+        </div>
+      ))}
     </div>
   )
 }

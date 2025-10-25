@@ -12,7 +12,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
   const [showPrompt, setShowPrompt] = useState(false)
   const [animationPhase, setAnimationPhase] = useState(0) // 0: typewriter, 1: shine, 2: glow, 3: pulse, 4: wave
   const [isMounted, setIsMounted] = useState(false)
-  const [cursorTrail, setCursorTrail] = useState<Array<{id: number, x: number, y: number, char: string, timestamp: number}>>([])
 
   // Complete "Umar Darsot" ASCII art with space
   const fullNameASCII = [
@@ -235,36 +234,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     }
   }, [onEnter, isMounted])
 
-  // Handle cursor trail effect
-  useEffect(() => {
-    if (!isMounted) return
-    
-    let trailId = 0
-    
-    const handleMouseMove = (e: MouseEvent) => {
-      const char = Math.random() > 0.5 ? '1' : '0'
-      const newTrail = {
-        id: trailId++,
-        x: e.clientX,
-        y: e.clientY,
-        char: char,
-        timestamp: Date.now()
-      }
-      
-      setCursorTrail(prev => [...prev, newTrail])
-      
-      // Remove old trail elements after 2 seconds
-      setTimeout(() => {
-        setCursorTrail(prev => prev.filter(item => item.id !== newTrail.id))
-      }, 2000)
-    }
-
-    window.addEventListener("mousemove", handleMouseMove)
-    
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove)
-    }
-  }, [isMounted])
 
 
   if (!isVisible) return null
@@ -351,20 +320,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
         </div>
       )}
 
-      {/* Cursor Trail Effect */}
-      {cursorTrail.map((trail) => (
-        <div
-          key={trail.id}
-          className="fixed pointer-events-none text-green-400 text-sm font-mono z-50 animate-fade-in"
-          style={{
-            left: trail.x,
-            top: trail.y,
-            transform: 'translate(-50%, -50%)'
-          }}
-        >
-          {trail.char}
-        </div>
-      ))}
 
     </div>
   )
