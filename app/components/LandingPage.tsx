@@ -155,6 +155,16 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
         const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
         setAudioContext(ctx)
         console.log('Audio context created:', ctx.state)
+        
+        // Test if audio works by playing a silent tone
+        const testOscillator = ctx.createOscillator()
+        const testGain = ctx.createGain()
+        testGain.gain.setValueAtTime(0, ctx.currentTime)
+        testOscillator.connect(testGain)
+        testGain.connect(ctx.destination)
+        testOscillator.start()
+        testOscillator.stop(ctx.currentTime + 0.1)
+        console.log('Audio test completed')
       } catch (error) {
         console.log('Audio not supported:', error)
       }
@@ -177,43 +187,50 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
 
   // Play musical note for each letter
   const playNote = async (letterIndex: number) => {
-    console.log('playNote called with index:', letterIndex)
+    console.log('🎵 playNote called with index:', letterIndex)
+    console.log('🎵 Audio context state:', audioContext?.state)
+    console.log('🎵 Musical notes length:', musicalNotes.length)
     
-    if (letterIndex < musicalNotes.length) {
-      if (!audioContext) {
-        console.log('No audio context available')
-        return
+    if (letterIndex >= musicalNotes.length) {
+      console.log('❌ Letter index out of range')
+      return
+    }
+    
+    if (!audioContext) {
+      console.log('❌ No audio context available')
+      return
+    }
+    
+    try {
+      // Resume audio context if suspended (this handles first user interaction)
+      if (audioContext.state === 'suspended') {
+        console.log('🔄 Resuming suspended audio context...')
+        await audioContext.resume()
+        console.log('✅ Audio context resumed, new state:', audioContext.state)
       }
       
-      try {
-        // Resume audio context if suspended (this handles first user interaction)
-        if (audioContext.state === 'suspended') {
-          await audioContext.resume()
-          console.log('Audio context resumed on first hover')
-        }
-        
-        const note = musicalNotes[letterIndex]
-        console.log('Playing note:', note.name, 'at frequency:', note.note)
-        
-        const oscillator = audioContext.createOscillator()
-        const gainNode = audioContext.createGain()
-        
-        oscillator.connect(gainNode)
-        gainNode.connect(audioContext.destination)
-        
-        oscillator.frequency.setValueAtTime(note.note, audioContext.currentTime)
-        oscillator.type = 'sine'
-        
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
-        
-        oscillator.start(audioContext.currentTime)
-        oscillator.stop(audioContext.currentTime + 0.3)
-        
-        console.log('Note played successfully')
-      } catch (error) {
-        console.log('Audio playback failed:', error)
-      }
+      const note = musicalNotes[letterIndex]
+      console.log('🎼 Playing note:', note.name, 'at frequency:', note.note)
+      
+      const oscillator = audioContext.createOscillator()
+      const gainNode = audioContext.createGain()
+      
+      oscillator.connect(gainNode)
+      gainNode.connect(audioContext.destination)
+      
+      oscillator.frequency.setValueAtTime(note.note, audioContext.currentTime)
+      oscillator.type = 'sine'
+      
+      // Make the note louder for testing
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5)
+      
+      oscillator.start(audioContext.currentTime)
+      oscillator.stop(audioContext.currentTime + 0.5)
+      
+      console.log('✅ Note played successfully')
+    } catch (error) {
+      console.log('❌ Audio playback failed:', error)
     }
   }
 
@@ -353,10 +370,20 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
 
       {/* Enhanced Cursor Prompt */}
       {showPrompt && (
-        <div className="flex items-center space-x-2 text-green-400 animate-fade-in">
-          <span className="animate-pulse text-green-400 text-xl">█</span>
-          <span className="animate-pulse text-lg">Press ENTER or click anywhere to access terminal</span>
-          <span className="animate-pulse text-green-400 text-xl">█</span>
+        <div className="flex flex-col items-center space-y-4 text-green-400 animate-fade-in">
+          <div className="flex items-center space-x-2">
+            <span className="animate-pulse text-green-400 text-xl">█</span>
+            <span className="animate-pulse text-lg">Press ENTER or click anywhere to access terminal</span>
+            <span className="animate-pulse text-green-400 text-xl">█</span>
+          </div>
+          
+          {/* Audio Test Button */}
+          <button 
+            onClick={() => playNote(0)}
+            className="px-4 py-2 bg-green-800 text-green-200 rounded hover:bg-green-700 transition-colors"
+          >
+            🎵 Test Audio (Click to play C4 note)
+          </button>
         </div>
       )}
 
