@@ -290,8 +290,6 @@ export default function TerminalPortfolio() {
           "  hobbies       - Display hobbies and interests",
           "  philosophy    - Show personal philosophy sections",
           "",
-          "Philosophy commands:",
-          "  philosophy     - Show personal philosophy sections",
           "",
         ]
         addInstantOutput(cmd, output)
