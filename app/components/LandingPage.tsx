@@ -173,7 +173,17 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     initAudio()
   }, [isMounted])
 
-
+  // Handle first user interaction to resume audio context
+  const handleFirstInteraction = async () => {
+    if (audioContext && audioContext.state === 'suspended') {
+      try {
+        await audioContext.resume()
+        console.log('✅ Audio context resumed on mouse movement')
+      } catch (error) {
+        console.log('❌ Failed to resume audio context:', error)
+      }
+    }
+  }
 
   // Show prompt after a delay
   useEffect(() => {
@@ -318,7 +328,10 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
   }
 
   return (
-    <div className="h-screen bg-black text-green-400 font-mono flex flex-col items-center justify-center overflow-hidden relative">
+    <div 
+      className="h-screen bg-black text-green-400 font-mono flex flex-col items-center justify-center overflow-hidden relative"
+      onMouseMove={handleFirstInteraction}
+    >
       {/* Animated ASCII Art */}
       <div className="mb-8 transform transition-all duration-1000 relative">
         {currentLetter < letterAnimations.length ? (
