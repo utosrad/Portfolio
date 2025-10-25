@@ -257,10 +257,10 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
       {/* Animated ASCII Art */}
       <div className="mb-8 transform transition-all duration-1000 relative">
         {currentLetter < letterAnimations.length ? (
-          // Typewriter effect - show letters once
+          // Typewriter effect - show letters once with hover effects
           <div className="flex justify-center space-x-2">
             {letterAnimations.slice(0, currentLetter + 1).map((letter, letterIndex) => (
-              <div key={letterIndex} className="text-center">
+              <div key={letterIndex} className="text-center hover:transform hover:-translate-y-2 transition-transform duration-200 cursor-pointer">
                 {letter.map((line, lineIndex) => (
                   <div 
                     key={lineIndex} 
@@ -274,8 +274,8 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
             ))}
           </div>
         ) : (
-          // Full name with complex animations
-          <div className={`text-center ${getAnimationClass()}`}>
+          // Full name with complex animations and hover effects
+          <div className={`text-center ${getAnimationClass()} hover:transform hover:-translate-y-1 transition-transform duration-200 cursor-pointer`}>
             {fullNameASCII.map((line, index) => (
               <div 
                 key={index} 
@@ -388,10 +388,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
         ))}
       </div>
 
-      {/* Scanning line effect */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-green-400 to-transparent opacity-50 animate-scan"></div>
-      </div>
     </div>
   )
 }
