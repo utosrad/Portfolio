@@ -322,27 +322,31 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
 
   return (
     <div 
-      className="h-screen bg-black text-green-400 font-mono flex flex-col items-center justify-center overflow-hidden relative"
+      className="h-screen bg-black text-green-400 font-mono flex flex-col items-center justify-center overflow-hidden relative px-4"
       onMouseMove={handleFirstInteraction}
     >
       {/* Animated ASCII Art */}
-      <div className="mb-8 transform transition-all duration-1000 relative">
+      <div className="mb-4 md:mb-8 transform transition-all duration-1000 relative w-full max-w-4xl">
         {currentLetter < letterAnimations.length ? (
           // Typewriter effect - show letters once with hover effects
-          <div className="flex justify-center space-x-2">
+          <div className="flex flex-wrap justify-center gap-1 md:gap-2">
             {letterAnimations.slice(0, currentLetter + 1).map((letter, letterIndex) => (
               <div 
                 key={letterIndex} 
-                className="text-center hover:transform hover:-translate-y-2 transition-transform duration-200 cursor-pointer"
+                className="text-center hover:transform hover:-translate-y-2 transition-transform duration-200 cursor-pointer touch-manipulation"
                 onMouseEnter={() => {
                   console.log('🎯 Hovering over letter index:', letterIndex)
+                  playNote(letterIndex)
+                }}
+                onTouchStart={() => {
+                  console.log('🎯 Touching letter index:', letterIndex)
                   playNote(letterIndex)
                 }}
               >
                 {letter.map((line, lineIndex) => (
                   <div 
                     key={lineIndex} 
-                    className="text-green-400 text-xs leading-tight animate-fade-in"
+                    className="text-green-400 text-[8px] sm:text-xs leading-tight animate-fade-in"
                     style={{ animationDelay: `${lineIndex * 0.05}s` }}
                   >
                     {line}
@@ -353,14 +357,19 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
           </div>
         ) : (
           // Full name with complex animations and hover effects
-          <div className={`text-center ${getAnimationClass()} hover:transform hover:-translate-y-1 transition-transform duration-200 cursor-pointer`}>
+          <div className={`text-center ${getAnimationClass()} hover:transform hover:-translate-y-1 transition-transform duration-200 cursor-pointer touch-manipulation`}>
             {fullNameASCII.map((line, index) => (
               <div 
                 key={index} 
-                className="text-green-400 text-xs leading-tight"
+                className="text-green-400 text-[6px] sm:text-xs leading-tight overflow-x-auto"
                 style={{ animationDelay: `${index * 0.1}s` }}
                 onMouseEnter={() => {
                   // Play a random note when hovering over the full ASCII art
+                  const randomIndex = Math.floor(Math.random() * musicalNotes.length)
+                  playNote(randomIndex)
+                }}
+                onTouchStart={() => {
+                  // Play a random note when touching the full ASCII art
                   const randomIndex = Math.floor(Math.random() * musicalNotes.length)
                   playNote(randomIndex)
                 }}
@@ -373,26 +382,31 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
       </div>
 
       {/* Subtitle without animations */}
-      <div className="mb-12 text-center">
-        <div className="text-green-300 text-lg mb-2">
+      <div className="mb-6 md:mb-12 text-center px-4">
+        <div className="text-green-300 text-sm sm:text-lg mb-2">
           Machine Learning Researcher & Data Scientist
         </div>
-        <div className="text-green-500 text-sm">
+        <div className="text-green-500 text-xs sm:text-sm">
           Interactive Terminal Portfolio
         </div>
       </div>
 
       {/* Enhanced Cursor Prompt */}
       {showPrompt && (
-        <div className="flex items-center space-x-2 text-green-400 animate-fade-in">
-          <span className="animate-pulse text-green-400 text-xl">█</span>
-          <button 
-            onClick={onEnter}
-            className="animate-pulse text-lg hover:bg-green-800 hover:bg-opacity-20 px-4 py-2 rounded transition-colors cursor-pointer"
-          >
-            Access Terminal
-          </button>
-          <span className="animate-pulse text-green-400 text-xl">█</span>
+        <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 text-green-400 animate-fade-in px-4">
+          <div className="flex items-center space-x-2">
+            <span className="animate-pulse text-green-400 text-lg sm:text-xl">█</span>
+            <button 
+              onClick={onEnter}
+              className="animate-pulse text-sm sm:text-lg hover:bg-green-800 hover:bg-opacity-20 px-3 sm:px-4 py-2 sm:py-2 rounded transition-colors cursor-pointer touch-manipulation min-h-[44px] flex items-center justify-center"
+            >
+              Access Terminal
+            </button>
+            <span className="animate-pulse text-green-400 text-lg sm:text-xl">█</span>
+          </div>
+          <div className="text-xs sm:text-sm text-green-500 mt-2 sm:mt-0">
+            Tap to enter
+          </div>
         </div>
       )}
 
