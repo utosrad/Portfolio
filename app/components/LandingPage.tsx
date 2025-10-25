@@ -327,8 +327,11 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
             {letterAnimations.slice(0, currentLetter + 1).map((letter, letterIndex) => (
               <div 
                 key={letterIndex} 
-                className="text-center hover:transform hover:-translate-y-2 transition-transform duration-200 cursor-pointer"
-                onMouseEnter={() => playNote(letterIndex)}
+                className="text-center hover:transform hover:-translate-y-2 transition-transform duration-200 cursor-pointer p-2 hover:bg-green-800 hover:bg-opacity-20 rounded"
+                onMouseEnter={() => {
+                  console.log('🎯 Hovering over letter index:', letterIndex)
+                  playNote(letterIndex)
+                }}
               >
                 {letter.map((line, lineIndex) => (
                   <div 
@@ -348,8 +351,13 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
             {fullNameASCII.map((line, index) => (
               <div 
                 key={index} 
-                className="text-green-400 text-xs leading-tight"
+                className="text-green-400 text-xs leading-tight hover:bg-green-800 hover:bg-opacity-20 transition-colors duration-200"
                 style={{ animationDelay: `${index * 0.1}s` }}
+                onMouseEnter={() => {
+                  // Play a random note when hovering over the full ASCII art
+                  const randomIndex = Math.floor(Math.random() * musicalNotes.length)
+                  playNote(randomIndex)
+                }}
               >
                 {line}
               </div>
