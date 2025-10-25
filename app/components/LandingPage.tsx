@@ -12,8 +12,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
   const [showPrompt, setShowPrompt] = useState(false)
   const [animationPhase, setAnimationPhase] = useState(0) // 0: typewriter, 1: shine, 2: glow, 3: pulse, 4: wave
   const [isMounted, setIsMounted] = useState(false)
-  const [easterEggs, setEasterEggs] = useState<Array<{id: number, x: number, y: number, revealed: boolean, fact: string}>>([])
-  const [showFact, setShowFact] = useState<{fact: string, x: number, y: number} | null>(null)
 
   // Complete "Umar Darsot" ASCII art with space
   const fullNameASCII = [
@@ -142,33 +140,9 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     { letter: 'T', note: 659.25, name: 'E5' }  // E5
   ]
 
-  // Star-themed fun facts
-  const starFacts = [
-    "⭐ I once stayed up for 48 hours debugging a neural network!",
-    "🌟 My favorite programming language is Python, but I'm fluent in JavaScript too!",
-    "✨ I believe the best code is written at 3 AM with coffee in hand!",
-    "⭐ I've contributed to open-source projects that have over 10,000 stars on GitHub!",
-    "🌟 My dream is to build an AI that can write better code than me!",
-    "✨ I once fixed a bug that had been causing issues for 6 months in just 10 minutes!",
-    "⭐ I'm passionate about making technology accessible to everyone!",
-    "🌟 I love solving problems that others think are impossible!",
-    "✨ My favorite algorithm is the Fast Fourier Transform - it's pure magic!",
-    "⭐ I believe in the power of collaboration and open-source development!"
-  ]
-
   // Handle hydration
   useEffect(() => {
     setIsMounted(true)
-    
-    // Initialize easter eggs with star positions
-    const eggs = starFacts.map((fact, index) => ({
-      id: index,
-      x: Math.random() * 80 + 10, // 10-90% of screen width
-      y: Math.random() * 60 + 20,  // 20-80% of screen height
-      revealed: false,
-      fact: fact
-    }))
-    setEasterEggs(eggs)
   }, [])
 
 
@@ -204,17 +178,14 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     }
   }
 
-  // Typewriter effect with musical notes
+  // Typewriter effect
   useEffect(() => {
     if (!isMounted) return
     
     const typewriterInterval = setInterval(() => {
       setCurrentLetter((prev) => {
         if (prev < letterAnimations.length - 1) {
-          const nextLetter = prev + 1
-          // Play musical note for the new letter
-          playNote(nextLetter)
-          return nextLetter
+          return prev + 1
         } else {
           // Start animation phases after typewriter completes
           setAnimationPhase(1)
@@ -253,19 +224,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     return () => window.removeEventListener("keydown", handleKeyPress)
   }, [onEnter, isMounted])
 
-  // Handle easter egg clicks
-  const handleEasterEggClick = (eggId: number, x: number, y: number) => {
-    const egg = easterEggs.find(e => e.id === eggId)
-    if (egg && !egg.revealed) {
-      setEasterEggs(prev => prev.map(e => 
-        e.id === eggId ? { ...e, revealed: true } : e
-      ))
-      setShowFact({ fact: egg.fact, x, y })
-      
-      // Hide fact after 4 seconds
-      setTimeout(() => setShowFact(null), 4000)
-    }
-  }
 
   if (!isVisible) return null
   
@@ -299,7 +257,11 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
           // Typewriter effect - show letters once with hover effects
           <div className="flex justify-center space-x-2">
             {letterAnimations.slice(0, currentLetter + 1).map((letter, letterIndex) => (
-              <div key={letterIndex} className="text-center hover:transform hover:-translate-y-2 transition-transform duration-200 cursor-pointer">
+              <div 
+                key={letterIndex} 
+                className="text-center hover:transform hover:-translate-y-2 transition-transform duration-200 cursor-pointer"
+                onMouseEnter={() => playNote(letterIndex)}
+              >
                 {letter.map((line, lineIndex) => (
                   <div 
                     key={lineIndex} 
@@ -347,36 +309,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
         </div>
       )}
 
-      {/* Star-themed Easter Eggs */}
-      {easterEggs.map((egg) => (
-        <div
-          key={egg.id}
-          className="absolute cursor-pointer text-yellow-400 text-2xl animate-pulse hover:scale-150 transition-transform duration-200"
-          style={{
-            left: `${egg.x}%`,
-            top: `${egg.y}%`,
-            transform: 'translate(-50%, -50%)',
-            opacity: egg.revealed ? 0.3 : 0.8
-          }}
-          onClick={() => handleEasterEggClick(egg.id, egg.x, egg.y)}
-        >
-          {egg.revealed ? '✨' : '⭐'}
-        </div>
-      ))}
-
-      {/* Fun Fact Display */}
-      {showFact && (
-        <div
-          className="absolute bg-black bg-opacity-80 border border-yellow-400 rounded-lg p-4 text-yellow-300 text-sm max-w-xs z-50 animate-fade-in"
-          style={{
-            left: `${showFact.x}%`,
-            top: `${showFact.y}%`,
-            transform: 'translate(-50%, -50%)'
-          }}
-        >
-          {showFact.fact}
-        </div>
-      )}
 
     </div>
   )
