@@ -137,7 +137,7 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     
     const timer = setTimeout(() => {
       setShowPrompt(true)
-    }, 8000) // Show prompt after typewriter completes
+    }, 4000) // Show prompt after typewriter completes
     return () => clearTimeout(timer)
   }, [isMounted])
 
@@ -156,7 +156,7 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
           return prev
         }
       })
-    }, 800) // Each letter appears every 800ms
+    }, 300) // Each letter appears every 300ms
 
     return () => clearInterval(typewriterInterval)
   }, [isMounted])
@@ -281,6 +281,35 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
             }}
           />
         ))}
+      </div>
+
+      {/* Digital rain effect */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute text-green-400 opacity-20 text-xs font-mono animate-digital-rain"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${2 + Math.random() * 2}s`
+            }}
+          >
+            {Math.random().toString(2).substring(2, 8)}
+          </div>
+        ))}
+      </div>
+
+      {/* Holographic grid overlay */}
+      <div className="absolute inset-0 pointer-events-none opacity-10">
+        <div className="w-full h-full bg-gradient-to-br from-transparent via-green-400/5 to-transparent"></div>
+        <div className="absolute inset-0" style={{
+          backgroundImage: `
+            linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px'
+        }}></div>
       </div>
 
       {/* Matrix-style rain effect */}
