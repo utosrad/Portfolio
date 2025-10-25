@@ -163,17 +163,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     initAudio()
   }, [isMounted])
 
-  // Handle first user interaction to resume audio context
-  const handleFirstInteraction = async () => {
-    if (audioContext && audioContext.state === 'suspended') {
-      try {
-        await audioContext.resume()
-        console.log('Audio context resumed')
-      } catch (error) {
-        console.log('Failed to resume audio context:', error)
-      }
-    }
-  }
 
 
   // Show prompt after a delay
@@ -197,8 +186,11 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
       }
       
       try {
-        // Handle first user interaction
-        await handleFirstInteraction()
+        // Resume audio context if suspended (this handles first user interaction)
+        if (audioContext.state === 'suspended') {
+          await audioContext.resume()
+          console.log('Audio context resumed on first hover')
+        }
         
         const note = musicalNotes[letterIndex]
         console.log('Playing note:', note.name, 'at frequency:', note.note)
@@ -309,10 +301,7 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
   }
 
   return (
-    <div 
-      className="h-screen bg-black text-green-400 font-mono flex flex-col items-center justify-center overflow-hidden relative"
-      onClick={handleFirstInteraction}
-    >
+    <div className="h-screen bg-black text-green-400 font-mono flex flex-col items-center justify-center overflow-hidden relative">
       {/* Animated ASCII Art */}
       <div className="mb-8 transform transition-all duration-1000 relative">
         {currentLetter < letterAnimations.length ? (
