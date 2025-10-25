@@ -327,7 +327,7 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
             {letterAnimations.slice(0, currentLetter + 1).map((letter, letterIndex) => (
               <div 
                 key={letterIndex} 
-                className="text-center hover:transform hover:-translate-y-2 transition-transform duration-200 cursor-pointer p-2 hover:bg-green-800 hover:bg-opacity-20 rounded"
+                className="text-center hover:transform hover:-translate-y-2 transition-transform duration-200 cursor-pointer"
                 onMouseEnter={() => {
                   console.log('🎯 Hovering over letter index:', letterIndex)
                   playNote(letterIndex)
@@ -351,7 +351,7 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
             {fullNameASCII.map((line, index) => (
               <div 
                 key={index} 
-                className="text-green-400 text-xs leading-tight hover:bg-green-800 hover:bg-opacity-20 transition-colors duration-200"
+                className="text-green-400 text-xs leading-tight"
                 style={{ animationDelay: `${index * 0.1}s` }}
                 onMouseEnter={() => {
                   // Play a random note when hovering over the full ASCII art
@@ -378,20 +378,10 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
 
       {/* Enhanced Cursor Prompt */}
       {showPrompt && (
-        <div className="flex flex-col items-center space-y-4 text-green-400 animate-fade-in">
-          <div className="flex items-center space-x-2">
-            <span className="animate-pulse text-green-400 text-xl">█</span>
-            <span className="animate-pulse text-lg">Press ENTER or click anywhere to access terminal</span>
-            <span className="animate-pulse text-green-400 text-xl">█</span>
-          </div>
-          
-          {/* Audio Test Button */}
-          <button 
-            onClick={() => playNote(0)}
-            className="px-4 py-2 bg-green-800 text-green-200 rounded hover:bg-green-700 transition-colors"
-          >
-            🎵 Test Audio (Click to play C4 note)
-          </button>
+        <div className="flex items-center space-x-2 text-green-400 animate-fade-in">
+          <span className="animate-pulse text-green-400 text-xl">█</span>
+          <span className="animate-pulse text-lg">Press ENTER or click anywhere to access terminal</span>
+          <span className="animate-pulse text-green-400 text-xl">█</span>
         </div>
       )}
 
