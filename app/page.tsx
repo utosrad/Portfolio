@@ -37,6 +37,7 @@ export default function TerminalPortfolio() {
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [isTyping, setIsTyping] = useState(false)
   const [cursorTrail, setCursorTrail] = useState<Array<{id: number, x: number, y: number, char: string, color: string, timestamp: number}>>([])
+  const [tunnelDepth, setTunnelDepth] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const terminalRef = useRef<HTMLDivElement>(null)
 
@@ -254,6 +255,15 @@ export default function TerminalPortfolio() {
     return () => {
       window.removeEventListener("mousemove", handleMouseMove)
     }
+  }, [])
+
+  // Handle tunnel effect animation
+  useEffect(() => {
+    const tunnelInterval = setInterval(() => {
+      setTunnelDepth(prev => (prev + 1) % 360)
+    }, 50) // Update every 50ms for smooth animation
+
+    return () => clearInterval(tunnelInterval)
   }, [])
 
   // Function to add command output instantly (no typing animation)
@@ -792,8 +802,28 @@ export default function TerminalPortfolio() {
   }
 
   return (
-    <div className="h-screen bg-black text-green-400 font-mono p-2 overflow-hidden">
-      <div className="h-full flex flex-col">
+    <div className="h-screen bg-black text-green-400 font-mono p-2 overflow-hidden relative">
+      {/* 3D Tunnel Effect Background */}
+      <div className="tunnel-container absolute inset-0 pointer-events-none">
+        <div className="tunnel-layer">
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              className="tunnel-ring"
+              style={{
+                width: `${100 + i * 50}px`,
+                height: `${100 + i * 50}px`,
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                borderColor: `rgba(34, 197, 94, ${0.3 - i * 0.03})`
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="h-full flex flex-col relative z-10">
         {/* Terminal Window Header */}
         <div className="bg-gray-800 rounded-t-lg px-4 py-2 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center space-x-2">
