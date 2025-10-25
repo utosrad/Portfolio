@@ -276,7 +276,7 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
   }, [animationPhase, isMounted])
 
 
-  // Handle Enter key and click anywhere
+  // Handle Enter key
   useEffect(() => {
     if (!isMounted) return
     
@@ -287,17 +287,10 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
       }
     }
 
-    const handleClick = () => {
-      setIsVisible(false)
-      setTimeout(() => onEnter(), 500) // Small delay for smooth transition
-    }
-
     window.addEventListener("keydown", handleKeyPress)
-    window.addEventListener("click", handleClick)
     
     return () => {
       window.removeEventListener("keydown", handleKeyPress)
-      window.removeEventListener("click", handleClick)
     }
   }, [onEnter, isMounted])
 
@@ -391,10 +384,19 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
 
       {/* Enhanced Cursor Prompt */}
       {showPrompt && (
-        <div className="flex items-center space-x-2 text-green-400 animate-fade-in">
-          <span className="animate-pulse text-green-400 text-xl">█</span>
-          <span className="animate-pulse text-lg">Press ENTER or click anywhere to access terminal</span>
-          <span className="animate-pulse text-green-400 text-xl">█</span>
+        <div className="flex flex-col items-center space-y-4 text-green-400 animate-fade-in">
+          <div className="flex items-center space-x-2">
+            <span className="animate-pulse text-green-400 text-xl">█</span>
+            <span className="animate-pulse text-lg">Access Terminal</span>
+            <span className="animate-pulse text-green-400 text-xl">█</span>
+          </div>
+          
+          <button 
+            onClick={onEnter}
+            className="px-6 py-3 bg-green-800 text-green-200 rounded-lg hover:bg-green-700 transition-colors font-mono text-lg border border-green-600 hover:border-green-500"
+          >
+            Enter Terminal
+          </button>
         </div>
       )}
 
