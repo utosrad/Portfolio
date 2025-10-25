@@ -12,6 +12,8 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
   const [showPrompt, setShowPrompt] = useState(false)
   const [animationPhase, setAnimationPhase] = useState(0) // 0: typewriter, 1: shine, 2: glow, 3: pulse, 4: wave
   const [isMounted, setIsMounted] = useState(false)
+  const [easterEggs, setEasterEggs] = useState<Array<{id: number, x: number, y: number, revealed: boolean, fact: string}>>([])
+  const [showFact, setShowFact] = useState<{fact: string, x: number, y: number} | null>(null)
 
   // Complete "Umar Darsot" ASCII art with space
   const fullNameASCII = [
@@ -126,9 +128,47 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     ]
   ]
 
+  // Musical notes for each letter
+  const musicalNotes = [
+    { letter: 'U', note: 261.63, name: 'C4' }, // C
+    { letter: 'M', note: 293.66, name: 'D4' }, // D
+    { letter: 'A', note: 329.63, name: 'E4' }, // E
+    { letter: 'R', note: 349.23, name: 'F4' }, // F
+    { letter: 'D', note: 392.00, name: 'G4' }, // G
+    { letter: 'A', note: 440.00, name: 'A4' }, // A
+    { letter: 'R', note: 493.88, name: 'B4' }, // B
+    { letter: 'S', note: 523.25, name: 'C5' }, // C5
+    { letter: 'O', note: 587.33, name: 'D5' }, // D5
+    { letter: 'T', note: 659.25, name: 'E5' }  // E5
+  ]
+
+  // Star-themed fun facts
+  const starFacts = [
+    "⭐ I once stayed up for 48 hours debugging a neural network!",
+    "🌟 My favorite programming language is Python, but I'm fluent in JavaScript too!",
+    "✨ I believe the best code is written at 3 AM with coffee in hand!",
+    "⭐ I've contributed to open-source projects that have over 10,000 stars on GitHub!",
+    "🌟 My dream is to build an AI that can write better code than me!",
+    "✨ I once fixed a bug that had been causing issues for 6 months in just 10 minutes!",
+    "⭐ I'm passionate about making technology accessible to everyone!",
+    "🌟 I love solving problems that others think are impossible!",
+    "✨ My favorite algorithm is the Fast Fourier Transform - it's pure magic!",
+    "⭐ I believe in the power of collaboration and open-source development!"
+  ]
+
   // Handle hydration
   useEffect(() => {
     setIsMounted(true)
+    
+    // Initialize easter eggs with star positions
+    const eggs = starFacts.map((fact, index) => ({
+      id: index,
+      x: Math.random() * 80 + 10, // 10-90% of screen width
+      y: Math.random() * 60 + 20,  // 20-80% of screen height
+      revealed: false,
+      fact: fact
+    }))
+    setEasterEggs(eggs)
   }, [])
 
 
@@ -142,14 +182,39 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     return () => clearTimeout(timer)
   }, [isMounted])
 
-  // Typewriter effect
+  // Play musical note for each letter
+  const playNote = (letterIndex: number) => {
+    if (letterIndex < musicalNotes.length) {
+      const note = musicalNotes[letterIndex]
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const oscillator = audioContext.createOscillator()
+      const gainNode = audioContext.createGain()
+      
+      oscillator.connect(gainNode)
+      gainNode.connect(audioContext.destination)
+      
+      oscillator.frequency.setValueAtTime(note.note, audioContext.currentTime)
+      oscillator.type = 'sine'
+      
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
+      
+      oscillator.start(audioContext.currentTime)
+      oscillator.stop(audioContext.currentTime + 0.3)
+    }
+  }
+
+  // Typewriter effect with musical notes
   useEffect(() => {
     if (!isMounted) return
     
     const typewriterInterval = setInterval(() => {
       setCurrentLetter((prev) => {
         if (prev < letterAnimations.length - 1) {
-          return prev + 1
+          const nextLetter = prev + 1
+          // Play musical note for the new letter
+          playNote(nextLetter)
+          return nextLetter
         } else {
           // Start animation phases after typewriter completes
           setAnimationPhase(1)
@@ -187,6 +252,20 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     window.addEventListener("keydown", handleKeyPress)
     return () => window.removeEventListener("keydown", handleKeyPress)
   }, [onEnter, isMounted])
+
+  // Handle easter egg clicks
+  const handleEasterEggClick = (eggId: number, x: number, y: number) => {
+    const egg = easterEggs.find(e => e.id === eggId)
+    if (egg && !egg.revealed) {
+      setEasterEggs(prev => prev.map(e => 
+        e.id === eggId ? { ...e, revealed: true } : e
+      ))
+      setShowFact({ fact: egg.fact, x, y })
+      
+      // Hide fact after 4 seconds
+      setTimeout(() => setShowFact(null), 4000)
+    }
+  }
 
   if (!isVisible) return null
   
@@ -268,6 +347,36 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
         </div>
       )}
 
+      {/* Star-themed Easter Eggs */}
+      {easterEggs.map((egg) => (
+        <div
+          key={egg.id}
+          className="absolute cursor-pointer text-yellow-400 text-2xl animate-pulse hover:scale-150 transition-transform duration-200"
+          style={{
+            left: `${egg.x}%`,
+            top: `${egg.y}%`,
+            transform: 'translate(-50%, -50%)',
+            opacity: egg.revealed ? 0.3 : 0.8
+          }}
+          onClick={() => handleEasterEggClick(egg.id, egg.x, egg.y)}
+        >
+          {egg.revealed ? '✨' : '⭐'}
+        </div>
+      ))}
+
+      {/* Fun Fact Display */}
+      {showFact && (
+        <div
+          className="absolute bg-black bg-opacity-80 border border-yellow-400 rounded-lg p-4 text-yellow-300 text-sm max-w-xs z-50 animate-fade-in"
+          style={{
+            left: `${showFact.x}%`,
+            top: `${showFact.y}%`,
+            transform: 'translate(-50%, -50%)'
+          }}
+        >
+          {showFact.fact}
+        </div>
+      )}
 
     </div>
   )
