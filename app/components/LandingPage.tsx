@@ -12,6 +12,7 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
   const [showPrompt, setShowPrompt] = useState(false)
   const [animationPhase, setAnimationPhase] = useState(0) // 0: typewriter, 1: shine, 2: glow, 3: pulse, 4: wave
   const [isMounted, setIsMounted] = useState(false)
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null)
 
   // Complete "Umar Darsot" ASCII art with space
   const fullNameASCII = [
@@ -145,6 +146,22 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     setIsMounted(true)
   }, [])
 
+  // Initialize audio context
+  useEffect(() => {
+    if (!isMounted) return
+    
+    const initAudio = async () => {
+      try {
+        const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+        setAudioContext(ctx)
+      } catch (error) {
+        console.log('Audio not supported')
+      }
+    }
+    
+    initAudio()
+  }, [isMounted])
+
 
   // Show prompt after a delay
   useEffect(() => {
@@ -157,24 +174,32 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
   }, [isMounted])
 
   // Play musical note for each letter
-  const playNote = (letterIndex: number) => {
-    if (letterIndex < musicalNotes.length) {
-      const note = musicalNotes[letterIndex]
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
-      const oscillator = audioContext.createOscillator()
-      const gainNode = audioContext.createGain()
-      
-      oscillator.connect(gainNode)
-      gainNode.connect(audioContext.destination)
-      
-      oscillator.frequency.setValueAtTime(note.note, audioContext.currentTime)
-      oscillator.type = 'sine'
-      
-      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
-      
-      oscillator.start(audioContext.currentTime)
-      oscillator.stop(audioContext.currentTime + 0.3)
+  const playNote = async (letterIndex: number) => {
+    if (letterIndex < musicalNotes.length && audioContext) {
+      try {
+        // Resume audio context if suspended
+        if (audioContext.state === 'suspended') {
+          await audioContext.resume()
+        }
+        
+        const note = musicalNotes[letterIndex]
+        const oscillator = audioContext.createOscillator()
+        const gainNode = audioContext.createGain()
+        
+        oscillator.connect(gainNode)
+        gainNode.connect(audioContext.destination)
+        
+        oscillator.frequency.setValueAtTime(note.note, audioContext.currentTime)
+        oscillator.type = 'sine'
+        
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime)
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3)
+        
+        oscillator.start(audioContext.currentTime)
+        oscillator.stop(audioContext.currentTime + 0.3)
+      } catch (error) {
+        console.log('Audio playback failed:', error)
+      }
     }
   }
 
