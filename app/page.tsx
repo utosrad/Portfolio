@@ -292,9 +292,6 @@ export default function TerminalPortfolio() {
           "",
           "Philosophy commands:",
           "  philosophy     - Show personal philosophy sections",
-          "  mindset        - Personal mindset philosophy",
-          "  decisions      - Decision-making philosophy", 
-          "  craft          - Craft development philosophy",
           "",
         ]
         addInstantOutput(cmd, output)
@@ -551,35 +548,6 @@ export default function TerminalPortfolio() {
         addInstantOutput(cmd, output)
         return
 
-      case "mindset":
-        output = [
-          "MINDSET PHILOSOPHY:",
-          "=".repeat(40),
-          "",
-          ...philosophy.mindset.content,
-        ]
-        addInstantOutput(cmd, output)
-        return
-
-      case "decisions":
-        output = [
-          "DECISIONS PHILOSOPHY:",
-          "=".repeat(40),
-          "",
-          ...philosophy.decisions.content,
-        ]
-        addInstantOutput(cmd, output)
-        return
-
-      case "craft":
-        output = [
-          "CRAFT PHILOSOPHY:",
-          "=".repeat(40),
-          "",
-          ...philosophy.craft.content,
-        ]
-        addInstantOutput(cmd, output)
-        return
 
       case "ls":
         if (currentPath === "~") {
@@ -948,10 +916,7 @@ export default function TerminalPortfolio() {
             <code className="bg-gray-800 px-1 rounded">philosophy</code>
           </p>
           <p className="text-xs">
-            Philosophy: <code className="bg-gray-800 px-1 rounded">philosophy</code>,{" "}
-            <code className="bg-gray-800 px-1 rounded">mindset</code>,{" "}
-            <code className="bg-gray-800 px-1 rounded">decisions</code>,{" "}
-            <code className="bg-gray-800 px-1 rounded">craft</code>
+            Philosophy: <code className="bg-gray-800 px-1 rounded">philosophy</code>
           </p>
         </div>
       </div>
