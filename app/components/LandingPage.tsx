@@ -393,20 +393,15 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
 
       {/* Enhanced Cursor Prompt */}
       {showPrompt && (
-        <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 text-green-400 animate-fade-in px-4">
-          <div className="flex items-center space-x-2">
-            <span className="animate-pulse text-green-400 text-lg sm:text-xl">█</span>
-            <button 
-              onClick={onEnter}
-              className="animate-pulse text-sm sm:text-lg hover:bg-green-800 hover:bg-opacity-20 px-3 sm:px-4 py-2 sm:py-2 rounded transition-colors cursor-pointer touch-manipulation min-h-[44px] flex items-center justify-center"
-            >
-              Access Terminal
-            </button>
-            <span className="animate-pulse text-green-400 text-lg sm:text-xl">█</span>
-          </div>
-          <div className="text-xs sm:text-sm text-green-500 mt-2 sm:mt-0">
-            Tap to enter
-          </div>
+        <div className="flex items-center space-x-2 text-green-400 animate-fade-in px-4">
+          <span className="animate-pulse text-green-400 text-lg sm:text-xl">█</span>
+          <button 
+            onClick={onEnter}
+            className="animate-pulse text-sm sm:text-lg hover:bg-green-800 hover:bg-opacity-20 px-3 sm:px-4 py-2 sm:py-2 rounded transition-colors cursor-pointer touch-manipulation min-h-[44px] flex items-center justify-center"
+          >
+            Access Terminal
+          </button>
+          <span className="animate-pulse text-green-400 text-lg sm:text-xl">█</span>
         </div>
       )}
 
