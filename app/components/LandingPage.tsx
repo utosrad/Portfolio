@@ -11,6 +11,7 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
   const [isVisible, setIsVisible] = useState(true)
   const [showPrompt, setShowPrompt] = useState(false)
   const [animationPhase, setAnimationPhase] = useState(0) // 0: typewriter, 1: shine, 2: glow, 3: pulse, 4: wave
+  const [isMounted, setIsMounted] = useState(false)
 
   // Complete "Umar Darsot" ASCII art with space
   const fullNameASCII = [
@@ -125,16 +126,25 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     ]
   ]
 
+  // Handle hydration
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
   // Show prompt after a delay
   useEffect(() => {
+    if (!isMounted) return
+    
     const timer = setTimeout(() => {
       setShowPrompt(true)
     }, 8000) // Show prompt after typewriter completes
     return () => clearTimeout(timer)
-  }, [])
+  }, [isMounted])
 
   // Typewriter effect
   useEffect(() => {
+    if (!isMounted) return
+    
     const typewriterInterval = setInterval(() => {
       setCurrentLetter((prev) => {
         if (prev < letterAnimations.length - 1) {
@@ -149,21 +159,23 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     }, 800) // Each letter appears every 800ms
 
     return () => clearInterval(typewriterInterval)
-  }, [])
+  }, [isMounted])
 
   // Animation phase cycling
   useEffect(() => {
-    if (animationPhase > 0) {
-      const phaseInterval = setInterval(() => {
-        setAnimationPhase((prev) => (prev + 1) % 5) // Cycle through phases 1-4
-      }, 3000) // Change phase every 3 seconds
+    if (!isMounted || animationPhase <= 0) return
+    
+    const phaseInterval = setInterval(() => {
+      setAnimationPhase((prev) => (prev + 1) % 5) // Cycle through phases 1-4
+    }, 3000) // Change phase every 3 seconds
 
-      return () => clearInterval(phaseInterval)
-    }
-  }, [animationPhase])
+    return () => clearInterval(phaseInterval)
+  }, [animationPhase, isMounted])
 
   // Handle Enter key
   useEffect(() => {
+    if (!isMounted) return
+    
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === "Enter") {
         setIsVisible(false)
@@ -173,9 +185,21 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
 
     window.addEventListener("keydown", handleKeyPress)
     return () => window.removeEventListener("keydown", handleKeyPress)
-  }, [onEnter])
+  }, [onEnter, isMounted])
 
   if (!isVisible) return null
+  
+  // Show loading state during hydration
+  if (!isMounted) {
+    return (
+      <div className="h-screen bg-black text-green-400 font-mono flex flex-col items-center justify-center overflow-hidden relative">
+        <div className="text-center">
+          <div className="text-green-400 text-lg mb-4">Loading...</div>
+          <div className="animate-pulse">█</div>
+        </div>
+      </div>
+    )
+  }
 
   const getAnimationClass = () => {
     switch (animationPhase) {
