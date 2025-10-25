@@ -573,6 +573,13 @@ export default function TerminalPortfolio() {
 
       case "resume":
         output = [
+          "██████╗░███████╗░██████╗██╗░░░██╗███╗░░░███╗███████╗",
+          "██╔══██╗██╔════╝██╔════╝██║░░░██║████╗░████║██╔════╝",
+          "██████╔╝█████╗░░╚█████╗░██║░░░██║██╔████╔██║█████╗░░",
+          "██╔══██╗██╔══╝░░░╚═══██╗██║░░░██║██║╚██╔╝██║██╔══╝░░",
+          "██║░░██║███████╗██████╔╝╚██████╔╝██║░╚═╝░██║███████╗",
+          "╚═╝░░╚═╝╚══════╝╚═════╝░░╚═════╝░╚═╝░░░░░╚═╝╚══════╝",
+          "",
           "=".repeat(60),
           `${developer.name.toUpperCase()}`,
           `${developer.title.toUpperCase()}`,
@@ -780,7 +787,7 @@ export default function TerminalPortfolio() {
                 // Check if this line is a bullet point or list item
                 if (line.startsWith("•") || line.startsWith("-") || line.startsWith("🎯") || line.startsWith("🧠") || line.startsWith("⚡") || line.startsWith("🎓") || line.startsWith("📧") || line.startsWith("📱") || line.startsWith("📍") || line.startsWith("🐙") || line.startsWith("💼") || line.startsWith("🌐")) {
                   return (
-                    <div key={lineIndex} className="text-blue-400 whitespace-pre-wrap">
+                    <div key={lineIndex} className="text-orange-400 whitespace-pre-wrap">
                       {line}
                     </div>
                   )
@@ -807,7 +814,7 @@ export default function TerminalPortfolio() {
                 // Check if this line is a number (for project lists, etc.)
                 if (/^\d+\./.test(line.trim())) {
                   return (
-                    <div key={lineIndex} className="text-orange-400 whitespace-pre-wrap">
+                    <div key={lineIndex} className="text-blue-400 whitespace-pre-wrap">
                       {line}
                     </div>
                   )
