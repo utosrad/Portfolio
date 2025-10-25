@@ -286,9 +286,9 @@ export default function TerminalPortfolio() {
           "",
           "Philosophy commands:",
           "  philosophy     - Show personal philosophy sections",
-          "  philosophy mindset    - Personal mindset philosophy",
-          "  philosophy decisions  - Decision-making philosophy", 
-          "  philosophy craft      - Craft development philosophy",
+          "  mindset        - Personal mindset philosophy",
+          "  decisions      - Decision-making philosophy", 
+          "  craft          - Craft development philosophy",
           "",
         ]
         addInstantOutput(cmd, output)
@@ -453,62 +453,52 @@ export default function TerminalPortfolio() {
         return
 
       case "philosophy":
-        // Handle philosophy sub-commands
-        if (args.length > 1) {
-          const subCommand = args[1]
-          switch (subCommand) {
-            case "mindset":
-              output = [
-                "MINDSET PHILOSOPHY:",
-                "=".repeat(40),
-                "",
-                ...philosophy.mindset.content,
-              ]
-              break
-            case "decisions":
-              output = [
-                "DECISIONS PHILOSOPHY:",
-                "=".repeat(40),
-                "",
-                ...philosophy.decisions.content,
-              ]
-              break
-            case "craft":
-              output = [
-                "CRAFT PHILOSOPHY:",
-                "=".repeat(40),
-                "",
-                ...philosophy.craft.content,
-              ]
-              break
-            default:
-              output = [
-                "Invalid philosophy sub-command.",
-                "Available sub-commands: mindset, decisions, craft",
-                "",
-                "Usage: philosophy <sub-command>",
-                "Example: philosophy mindset",
-                "",
-              ]
-          }
-        } else {
-          output = [
-            "PERSONAL PHILOSOPHY:",
-            "=".repeat(40),
-            "",
-            "Welcome to my personal philosophy section.",
-            "Here you'll find my core beliefs about mindset, decisions, and craft.",
-            "",
-            "Available philosophy sections:",
-            "",
-            "🧠 mindset    - Personal mindset philosophy",
-            "🎯 decisions  - Decision-making philosophy", 
-            "⚡ craft      - Craft development philosophy",
-            "",
-            "Type 'philosophy mindset', 'philosophy decisions', or 'philosophy craft' to explore each section.",
-            "",
-          ]
-        }
+        output = [
+          "PERSONAL PHILOSOPHY:",
+          "=".repeat(40),
+          "",
+          "Welcome to my personal philosophy section.",
+          "Here you'll find my core beliefs about mindset, decisions, and craft.",
+          "",
+          "Available philosophy sections:",
+          "",
+          "🧠 mindset    - Personal mindset philosophy",
+          "🎯 decisions  - Decision-making philosophy", 
+          "⚡ craft      - Craft development philosophy",
+          "",
+          "Type 'mindset', 'decisions', or 'craft' to explore each section.",
+          "",
+        ]
+        addInstantOutput(cmd, output)
+        return
+
+      case "mindset":
+        output = [
+          "MINDSET PHILOSOPHY:",
+          "=".repeat(40),
+          "",
+          ...philosophy.mindset.content,
+        ]
+        addInstantOutput(cmd, output)
+        return
+
+      case "decisions":
+        output = [
+          "DECISIONS PHILOSOPHY:",
+          "=".repeat(40),
+          "",
+          ...philosophy.decisions.content,
+        ]
+        addInstantOutput(cmd, output)
+        return
+
+      case "craft":
+        output = [
+          "CRAFT PHILOSOPHY:",
+          "=".repeat(40),
+          "",
+          ...philosophy.craft.content,
+        ]
         addInstantOutput(cmd, output)
         return
 
@@ -769,6 +759,61 @@ export default function TerminalPortfolio() {
                   )
                 }
                 
+                // Check if this line is a title (contains ":" and is in caps)
+                if (line.includes(":") && line === line.toUpperCase() && line.length < 50) {
+                  return (
+                    <div key={lineIndex} className="text-green-400 whitespace-pre-wrap font-bold">
+                      {line}
+                    </div>
+                  )
+                }
+                
+                // Check if this line is a separator (contains "=")
+                if (line.includes("=") && line.length > 10) {
+                  return (
+                    <div key={lineIndex} className="text-green-500 whitespace-pre-wrap">
+                      {line}
+                    </div>
+                  )
+                }
+                
+                // Check if this line is a bullet point or list item
+                if (line.startsWith("•") || line.startsWith("-") || line.startsWith("🎯") || line.startsWith("🧠") || line.startsWith("⚡") || line.startsWith("🎓") || line.startsWith("📧") || line.startsWith("📱") || line.startsWith("📍") || line.startsWith("🐙") || line.startsWith("💼") || line.startsWith("🌐")) {
+                  return (
+                    <div key={lineIndex} className="text-blue-400 whitespace-pre-wrap">
+                      {line}
+                    </div>
+                  )
+                }
+                
+                // Check if this line is a section divider
+                if (line.includes("⸻")) {
+                  return (
+                    <div key={lineIndex} className="text-purple-400 whitespace-pre-wrap">
+                      {line}
+                    </div>
+                  )
+                }
+                
+                // Check if this line is a command or code
+                if (line.startsWith("Type ") || line.startsWith("Usage:") || line.startsWith("Example:")) {
+                  return (
+                    <div key={lineIndex} className="text-cyan-400 whitespace-pre-wrap">
+                      {line}
+                    </div>
+                  )
+                }
+                
+                // Check if this line is a number (for project lists, etc.)
+                if (/^\d+\./.test(line.trim())) {
+                  return (
+                    <div key={lineIndex} className="text-orange-400 whitespace-pre-wrap">
+                      {line}
+                    </div>
+                  )
+                }
+                
+                // Default color for regular text
                 return (
                   <div key={lineIndex} className="text-green-300 whitespace-pre-wrap">
                     {line}
@@ -813,9 +858,10 @@ export default function TerminalPortfolio() {
             <code className="bg-gray-800 px-1 rounded">philosophy</code>
           </p>
           <p className="text-xs">
-            Philosophy: <code className="bg-gray-800 px-1 rounded">philosophy mindset</code>,{" "}
-            <code className="bg-gray-800 px-1 rounded">philosophy decisions</code>,{" "}
-            <code className="bg-gray-800 px-1 rounded">philosophy craft</code>
+            Philosophy: <code className="bg-gray-800 px-1 rounded">philosophy</code>,{" "}
+            <code className="bg-gray-800 px-1 rounded">mindset</code>,{" "}
+            <code className="bg-gray-800 px-1 rounded">decisions</code>,{" "}
+            <code className="bg-gray-800 px-1 rounded">craft</code>
           </p>
         </div>
       </div>
