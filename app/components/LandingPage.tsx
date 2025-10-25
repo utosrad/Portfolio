@@ -152,8 +152,8 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
           id: Date.now() + Math.random()
         }]
         
-        // Keep only last 20 characters
-        return newTrail.slice(-20)
+        // Keep only last 50 characters
+        return newTrail.slice(-50)
       })
     }
 
@@ -166,7 +166,7 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     if (!isMounted) return
 
     const cleanupInterval = setInterval(() => {
-      setCursorTrail(prev => prev.filter(item => Date.now() - item.id < 2000))
+      setCursorTrail(prev => prev.filter(item => Date.now() - item.id < 5000))
     }, 100)
 
     return () => clearInterval(cleanupInterval)
@@ -257,24 +257,10 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
       {/* Animated ASCII Art */}
       <div className="mb-8 transform transition-all duration-1000 relative">
         {currentLetter < letterAnimations.length ? (
-          // Typewriter effect - show letters on both sides
+          // Typewriter effect - show letters once
           <div className="flex justify-center space-x-2">
             {letterAnimations.slice(0, currentLetter + 1).map((letter, letterIndex) => (
               <div key={letterIndex} className="text-center">
-                {letter.map((line, lineIndex) => (
-                  <div 
-                    key={lineIndex} 
-                    className="text-green-400 text-xs leading-tight animate-fade-in"
-                    style={{ animationDelay: `${lineIndex * 0.05}s` }}
-                  >
-                    {line}
-                  </div>
-                ))}
-              </div>
-            ))}
-            {/* Mirror effect - show same letters on the right side */}
-            {letterAnimations.slice(0, currentLetter + 1).map((letter, letterIndex) => (
-              <div key={`mirror-${letterIndex}`} className="text-center opacity-60">
                 {letter.map((line, lineIndex) => (
                   <div 
                     key={lineIndex} 
