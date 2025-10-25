@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { Minimize2, Square, X } from "lucide-react"
+import LandingPage from "./components/LandingPage"
 
 // Custom component for clickable links in terminal
 const TerminalLink = ({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) => {
@@ -28,6 +29,7 @@ interface Command {
 }
 
 export default function TerminalPortfolio() {
+  const [showTerminal, setShowTerminal] = useState(false)
   const [currentPath, setCurrentPath] = useState("~")
   const [input, setInput] = useState("")
   const [history, setHistory] = useState<Command[]>([])
@@ -194,6 +196,10 @@ export default function TerminalPortfolio() {
     `Type 'help' to see available commands`,
     "",
   ]
+
+  const handleEnter = () => {
+    setShowTerminal(true)
+  }
 
   useEffect(() => {
     setHistory([
@@ -780,6 +786,10 @@ export default function TerminalPortfolio() {
         setInput("")
       }
     }
+  }
+
+  if (!showTerminal) {
+    return <LandingPage onEnter={handleEnter} />
   }
 
   return (
