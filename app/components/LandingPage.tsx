@@ -12,6 +12,8 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
   const [showPrompt, setShowPrompt] = useState(false)
   const [animationPhase, setAnimationPhase] = useState(0) // 0: typewriter, 1: shine, 2: glow, 3: pulse, 4: wave
   const [isMounted, setIsMounted] = useState(false)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [cursorTrail, setCursorTrail] = useState<Array<{x: number, y: number, char: string, id: number}>>([])
 
   // Complete "Umar Darsot" ASCII art with space
   const fullNameASCII = [
@@ -131,6 +133,45 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     setIsMounted(true)
   }, [])
 
+  // Mouse tracking and cursor trail
+  useEffect(() => {
+    if (!isMounted) return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY })
+      
+      // Add character to trail
+      const chars = ['0', '1', '█', '░', '▓', '▒', '■', '□', '●', '○']
+      const randomChar = chars[Math.floor(Math.random() * chars.length)]
+      
+      setCursorTrail(prev => {
+        const newTrail = [...prev, {
+          x: e.clientX,
+          y: e.clientY,
+          char: randomChar,
+          id: Date.now() + Math.random()
+        }]
+        
+        // Keep only last 20 characters
+        return newTrail.slice(-20)
+      })
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [isMounted])
+
+  // Clean up old trail characters
+  useEffect(() => {
+    if (!isMounted) return
+
+    const cleanupInterval = setInterval(() => {
+      setCursorTrail(prev => prev.filter(item => Date.now() - item.id < 2000))
+    }, 100)
+
+    return () => clearInterval(cleanupInterval)
+  }, [isMounted])
+
   // Show prompt after a delay
   useEffect(() => {
     if (!isMounted) return
@@ -216,10 +257,24 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
       {/* Animated ASCII Art */}
       <div className="mb-8 transform transition-all duration-1000 relative">
         {currentLetter < letterAnimations.length ? (
-          // Typewriter effect - show letters one by one
+          // Typewriter effect - show letters on both sides
           <div className="flex justify-center space-x-2">
             {letterAnimations.slice(0, currentLetter + 1).map((letter, letterIndex) => (
               <div key={letterIndex} className="text-center">
+                {letter.map((line, lineIndex) => (
+                  <div 
+                    key={lineIndex} 
+                    className="text-green-400 text-xs leading-tight animate-fade-in"
+                    style={{ animationDelay: `${lineIndex * 0.05}s` }}
+                  >
+                    {line}
+                  </div>
+                ))}
+              </div>
+            ))}
+            {/* Mirror effect - show same letters on the right side */}
+            {letterAnimations.slice(0, currentLetter + 1).map((letter, letterIndex) => (
+              <div key={`mirror-${letterIndex}`} className="text-center opacity-60">
                 {letter.map((line, lineIndex) => (
                   <div 
                     key={lineIndex} 
@@ -248,12 +303,12 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
         )}
       </div>
 
-      {/* Subtitle with enhanced animations */}
-      <div className="mb-12 text-center animate-fade-in">
-        <div className="text-green-300 text-lg mb-2 animate-bounce-slow">
+      {/* Subtitle without animations */}
+      <div className="mb-12 text-center">
+        <div className="text-green-300 text-lg mb-2">
           Machine Learning Researcher & Data Scientist
         </div>
-        <div className="text-green-500 text-sm animate-pulse-slow">
+        <div className="text-green-500 text-sm">
           Interactive Terminal Portfolio
         </div>
       </div>
@@ -283,19 +338,21 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
         ))}
       </div>
 
-      {/* Digital rain effect */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(20)].map((_, i) => (
+      {/* Cursor trail effect */}
+      <div className="absolute inset-0 pointer-events-none">
+        {cursorTrail.map((item) => (
           <div
-            key={i}
-            className="absolute text-green-400 opacity-20 text-xs font-mono animate-digital-rain"
+            key={item.id}
+            className="absolute text-green-400 text-sm font-mono animate-fade-in"
             style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 2}s`
+              left: item.x,
+              top: item.y,
+              transform: 'translate(-50%, -50%)',
+              opacity: 0.8,
+              zIndex: 1000
             }}
           >
-            {Math.random().toString(2).substring(2, 8)}
+            {item.char}
           </div>
         ))}
       </div>
