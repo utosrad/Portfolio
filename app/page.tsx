@@ -284,10 +284,11 @@ export default function TerminalPortfolio() {
           "  hobbies       - Display hobbies and interests",
           "  philosophy    - Show personal philosophy sections",
           "",
-          "Philosophy sub-commands:",
-          "  mindset       - Personal mindset philosophy",
-          "  decisions     - Decision-making philosophy", 
-          "  craft         - Craft development philosophy",
+          "Philosophy commands:",
+          "  philosophy     - Show personal philosophy sections",
+          "  philosophy mindset    - Personal mindset philosophy",
+          "  philosophy decisions  - Decision-making philosophy", 
+          "  philosophy craft      - Craft development philosophy",
           "",
         ]
         addInstantOutput(cmd, output)
@@ -452,49 +453,62 @@ export default function TerminalPortfolio() {
         return
 
       case "philosophy":
-        output = [
-          "PERSONAL PHILOSOPHY:",
-          "=".repeat(40),
-          "",
-          "Available philosophy sections:",
-          "",
-          "🧠 mindset    - Personal mindset philosophy",
-          "🎯 decisions  - Decision-making philosophy", 
-          "⚡ craft      - Craft development philosophy",
-          "",
-          "Type 'mindset', 'decisions', or 'craft' to explore each section.",
-          "",
-        ]
-        addInstantOutput(cmd, output)
-        return
-
-      case "mindset":
-        output = [
-          "MINDSET PHILOSOPHY:",
-          "=".repeat(40),
-          "",
-          ...philosophy.mindset.content,
-        ]
-        addInstantOutput(cmd, output)
-        return
-
-      case "decisions":
-        output = [
-          "DECISIONS PHILOSOPHY:",
-          "=".repeat(40),
-          "",
-          ...philosophy.decisions.content,
-        ]
-        addInstantOutput(cmd, output)
-        return
-
-      case "craft":
-        output = [
-          "CRAFT PHILOSOPHY:",
-          "=".repeat(40),
-          "",
-          ...philosophy.craft.content,
-        ]
+        // Handle philosophy sub-commands
+        if (args.length > 1) {
+          const subCommand = args[1]
+          switch (subCommand) {
+            case "mindset":
+              output = [
+                "MINDSET PHILOSOPHY:",
+                "=".repeat(40),
+                "",
+                ...philosophy.mindset.content,
+              ]
+              break
+            case "decisions":
+              output = [
+                "DECISIONS PHILOSOPHY:",
+                "=".repeat(40),
+                "",
+                ...philosophy.decisions.content,
+              ]
+              break
+            case "craft":
+              output = [
+                "CRAFT PHILOSOPHY:",
+                "=".repeat(40),
+                "",
+                ...philosophy.craft.content,
+              ]
+              break
+            default:
+              output = [
+                "Invalid philosophy sub-command.",
+                "Available sub-commands: mindset, decisions, craft",
+                "",
+                "Usage: philosophy <sub-command>",
+                "Example: philosophy mindset",
+                "",
+              ]
+          }
+        } else {
+          output = [
+            "PERSONAL PHILOSOPHY:",
+            "=".repeat(40),
+            "",
+            "Welcome to my personal philosophy section.",
+            "Here you'll find my core beliefs about mindset, decisions, and craft.",
+            "",
+            "Available philosophy sections:",
+            "",
+            "🧠 mindset    - Personal mindset philosophy",
+            "🎯 decisions  - Decision-making philosophy", 
+            "⚡ craft      - Craft development philosophy",
+            "",
+            "Type 'philosophy mindset', 'philosophy decisions', or 'philosophy craft' to explore each section.",
+            "",
+          ]
+        }
         addInstantOutput(cmd, output)
         return
 
@@ -797,6 +811,11 @@ export default function TerminalPortfolio() {
             <code className="bg-gray-800 px-1 rounded">contact</code>,{" "}
             <code className="bg-gray-800 px-1 rounded">education</code>,{" "}
             <code className="bg-gray-800 px-1 rounded">philosophy</code>
+          </p>
+          <p className="text-xs">
+            Philosophy: <code className="bg-gray-800 px-1 rounded">philosophy mindset</code>,{" "}
+            <code className="bg-gray-800 px-1 rounded">philosophy decisions</code>,{" "}
+            <code className="bg-gray-800 px-1 rounded">philosophy craft</code>
           </p>
         </div>
       </div>
