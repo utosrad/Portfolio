@@ -154,13 +154,26 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
       try {
         const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
         setAudioContext(ctx)
+        console.log('Audio context created:', ctx.state)
       } catch (error) {
-        console.log('Audio not supported')
+        console.log('Audio not supported:', error)
       }
     }
     
     initAudio()
   }, [isMounted])
+
+  // Handle first user interaction to resume audio context
+  const handleFirstInteraction = async () => {
+    if (audioContext && audioContext.state === 'suspended') {
+      try {
+        await audioContext.resume()
+        console.log('Audio context resumed')
+      } catch (error) {
+        console.log('Failed to resume audio context:', error)
+      }
+    }
+  }
 
 
   // Show prompt after a delay
@@ -175,14 +188,21 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
 
   // Play musical note for each letter
   const playNote = async (letterIndex: number) => {
-    if (letterIndex < musicalNotes.length && audioContext) {
+    console.log('playNote called with index:', letterIndex)
+    
+    if (letterIndex < musicalNotes.length) {
+      if (!audioContext) {
+        console.log('No audio context available')
+        return
+      }
+      
       try {
-        // Resume audio context if suspended
-        if (audioContext.state === 'suspended') {
-          await audioContext.resume()
-        }
+        // Handle first user interaction
+        await handleFirstInteraction()
         
         const note = musicalNotes[letterIndex]
+        console.log('Playing note:', note.name, 'at frequency:', note.note)
+        
         const oscillator = audioContext.createOscillator()
         const gainNode = audioContext.createGain()
         
@@ -197,6 +217,8 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
         
         oscillator.start(audioContext.currentTime)
         oscillator.stop(audioContext.currentTime + 0.3)
+        
+        console.log('Note played successfully')
       } catch (error) {
         console.log('Audio playback failed:', error)
       }
@@ -287,7 +309,10 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
   }
 
   return (
-    <div className="h-screen bg-black text-green-400 font-mono flex flex-col items-center justify-center overflow-hidden relative">
+    <div 
+      className="h-screen bg-black text-green-400 font-mono flex flex-col items-center justify-center overflow-hidden relative"
+      onClick={handleFirstInteraction}
+    >
       {/* Animated ASCII Art */}
       <div className="mb-8 transform transition-all duration-1000 relative">
         {currentLetter < letterAnimations.length ? (
