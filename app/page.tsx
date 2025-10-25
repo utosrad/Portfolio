@@ -934,8 +934,8 @@ export default function TerminalPortfolio() {
         </div>
       </div>
 
-      {/* Large ASCII Text Effect at Bottom */}
-      <div className="absolute bottom-4 right-4 w-96 h-64 z-50 pointer-events-none">
+      {/* ASCII Text Effect on Right Side - Rotated 90 degrees */}
+      <div className="absolute top-1/2 right-4 w-64 h-96 z-50 pointer-events-none transform -translate-y-1/2 rotate-90">
         <ASCIIText
           text="Umar Darsot"
           enableWaves={true}
