@@ -887,7 +887,7 @@ export default function TerminalPortfolio() {
                 // Check if this line is a number (for project lists, etc.)
                 if (/^\d+\./.test(line.trim())) {
                   return (
-                    <div key={lineIndex} className="text-blue-400 whitespace-pre-wrap">
+                    <div key={lineIndex} className="text-magenta-400 whitespace-pre-wrap">
                       {line}
                     </div>
                   )
