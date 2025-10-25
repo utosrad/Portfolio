@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Minimize2, Square, X } from "lucide-react"
 import LandingPage from "./components/LandingPage"
+import StarWars from "./components/StarWars"
 
 // Custom component for clickable links in terminal
 const TerminalLink = ({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) => {
@@ -36,7 +37,7 @@ export default function TerminalPortfolio() {
   const [commandHistory, setCommandHistory] = useState<string[]>([])
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [isTyping, setIsTyping] = useState(false)
-  const [tunnelDepth, setTunnelDepth] = useState(0)
+  const [showStarWars, setShowStarWars] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const terminalRef = useRef<HTMLDivElement>(null)
 
@@ -225,14 +226,6 @@ export default function TerminalPortfolio() {
   }, [history])
 
 
-  // Handle tunnel effect animation
-  useEffect(() => {
-    const tunnelInterval = setInterval(() => {
-      setTunnelDepth(prev => (prev + 1) % 360)
-    }, 50) // Update every 50ms for smooth animation
-
-    return () => clearInterval(tunnelInterval)
-  }, [])
 
   // Function to add command output instantly (no typing animation)
   const addInstantOutput = (cmd: string, output: string[]) => {
@@ -300,6 +293,7 @@ export default function TerminalPortfolio() {
           "  languages     - Show language proficiency",
           "  hobbies       - Display hobbies and interests",
           "  philosophy    - Show personal philosophy sections",
+          "  starwars      - Watch Star Wars opening crawl",
           "",
           "",
         ]
@@ -557,6 +551,10 @@ export default function TerminalPortfolio() {
         addInstantOutput(cmd, output)
         return
 
+      case "starwars":
+      case "star wars":
+        setShowStarWars(true)
+        return
 
       case "ls":
         if (currentPath === "~") {
@@ -769,29 +767,13 @@ export default function TerminalPortfolio() {
     return <LandingPage onEnter={handleEnter} />
   }
 
-  return (
-    <div className="h-screen bg-black text-green-400 font-mono p-2 overflow-hidden relative">
-      {/* 3D Tunnel Effect Background */}
-      <div className="tunnel-container absolute inset-0 pointer-events-none">
-        <div className="tunnel-layer">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="tunnel-ring"
-              style={{
-                width: `${150 + i * 80}px`,
-                height: `${150 + i * 80}px`,
-                left: '50%',
-                top: '50%',
-                transform: 'translate(-50%, -50%)',
-                borderColor: `rgba(34, 197, 94, ${0.9 - i * 0.1})`
-              }}
-            />
-          ))}
-        </div>
-      </div>
+  if (showStarWars) {
+    return <StarWars onClose={() => setShowStarWars(false)} />
+  }
 
-      <div className="h-full flex flex-col relative z-10">
+  return (
+    <div className="h-screen bg-black text-green-400 font-mono p-2 overflow-hidden">
+      <div className="h-full flex flex-col">
         {/* Terminal Window Header */}
         <div className="bg-gray-800 rounded-t-lg px-4 py-2 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center space-x-2">
@@ -936,7 +918,8 @@ export default function TerminalPortfolio() {
             Quick commands: <code className="bg-gray-800 px-1 rounded">resume</code> |{" "}
             <code className="bg-gray-800 px-1 rounded">experience</code> |{" "}
             <code className="bg-gray-800 px-1 rounded">skills</code> |{" "}
-            <code className="bg-gray-800 px-1 rounded">projects</code>
+            <code className="bg-gray-800 px-1 rounded">projects</code> |{" "}
+            <code className="bg-gray-800 px-1 rounded">starwars</code>
           </p>
           <p className="text-xs">
             Direct access: <code className="bg-gray-800 px-1 rounded">about</code>,{" "}
