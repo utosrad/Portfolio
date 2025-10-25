@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import ASCIIText from "./ASCIIText"
 
 interface LandingPageProps {
   onEnter: () => void
@@ -13,7 +12,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
   const [showPrompt, setShowPrompt] = useState(false)
   const [animationPhase, setAnimationPhase] = useState(0) // 0: typewriter, 1: shine, 2: glow, 3: pulse, 4: wave
   const [isMounted, setIsMounted] = useState(false)
-  const [showASCII, setShowASCII] = useState(false)
 
   // Complete "Umar Darsot" ASCII art with space
   const fullNameASCII = [
@@ -211,14 +209,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
     return () => clearInterval(phaseInterval)
   }, [animationPhase, isMounted])
 
-  // Show ASCII effect after typewriter completes
-  useEffect(() => {
-    if (!isMounted) return
-    const timer = setTimeout(() => {
-      setShowASCII(true)
-    }, 2000) // Show ASCII effect 2 seconds after typewriter starts
-    return () => clearTimeout(timer)
-  }, [isMounted])
 
   // Handle Enter key and click anywhere
   useEffect(() => {
@@ -331,19 +321,6 @@ export default function LandingPage({ onEnter }: LandingPageProps) {
         </div>
       )}
 
-      {/* 3D ASCII Text Effect */}
-      {showASCII && (
-        <div className="absolute inset-0 z-10">
-          <ASCIIText
-            text="Umar Darsot"
-            enableWaves={true}
-            asciiFontSize={6}
-            textFontSize={150}
-            textColor="#00ff00"
-            planeBaseHeight={6}
-          />
-        </div>
-      )}
 
     </div>
   )

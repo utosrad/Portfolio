@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react"
 import { Minimize2, Square, X } from "lucide-react"
 import LandingPage from "./components/LandingPage"
 import StarWars from "./components/StarWars"
+import ASCIIText from "./components/ASCIIText"
 
 // Custom component for clickable links in terminal
 const TerminalLink = ({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) => {
@@ -931,6 +932,18 @@ export default function TerminalPortfolio() {
             Philosophy: <code className="bg-gray-800 px-1 rounded">philosophy</code>
           </p>
         </div>
+      </div>
+
+      {/* Small ASCII Text Effect at Bottom */}
+      <div className="absolute bottom-0 right-0 w-64 h-32 z-10">
+        <ASCIIText
+          text="Umar"
+          enableWaves={true}
+          asciiFontSize={4}
+          textFontSize={60}
+          textColor="#00ff00"
+          planeBaseHeight={3}
+        />
       </div>
 
     </div>
