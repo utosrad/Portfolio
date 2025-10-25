@@ -934,15 +934,15 @@ export default function TerminalPortfolio() {
         </div>
       </div>
 
-      {/* Small ASCII Text Effect at Bottom */}
-      <div className="absolute bottom-0 right-0 w-64 h-32 z-10">
+      {/* Large ASCII Text Effect at Bottom */}
+      <div className="absolute bottom-0 right-0 w-96 h-64 z-10">
         <ASCIIText
-          text="Umar"
+          text="Umar Darsot"
           enableWaves={true}
-          asciiFontSize={4}
-          textFontSize={60}
+          asciiFontSize={6}
+          textFontSize={120}
           textColor="#00ff00"
-          planeBaseHeight={3}
+          planeBaseHeight={5}
         />
       </div>
 
