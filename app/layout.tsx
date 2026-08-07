@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next"
 import { JetBrains_Mono, Inter } from "next/font/google"
 import "./globals.css"
-import { profile } from "./data/profile"
+import { about, education, experience, profile, projects, skills } from "./data/profile"
+import { THEMES } from "./lib/terminal"
 
 const mono = JetBrains_Mono({
   subsets: ["latin"],
@@ -16,7 +17,7 @@ const sans = Inter({
 })
 
 const description =
-  "Umar Darsot — software engineer and Waterloo math co-op student. Most recently Dapital, previously Interac and Purolator."
+  "Umar Darsot — software engineer and Waterloo math co-op student. Most recently Whop, previously Dapital, Interac and Purolator."
 
 export const metadata: Metadata = {
   metadataBase: new URL(profile.website),
@@ -29,6 +30,7 @@ export const metadata: Metadata = {
     "Umar Darsot",
     "software engineer",
     "University of Waterloo",
+    "Whop",
     "Dapital",
     "Interac",
     "iOS",
@@ -73,10 +75,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#07090b" },
-    { media: "(prefers-color-scheme: light)", color: "#07090b" },
-  ],
+  themeColor: "#07090b",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -88,13 +87,21 @@ const jsonLd = {
   "@type": "Person",
   name: profile.name,
   url: profile.website,
-  email: `mailto:${profile.email}`,
+  email: profile.email,
   jobTitle: profile.title,
-  worksFor: { "@type": "Organization", name: "Dapital" },
-  alumniOf: { "@type": "CollegeOrUniversity", name: "University of Waterloo" },
+  hasOccupation: { "@type": "Occupation", name: profile.title },
+  // `affiliation`, not `alumniOf` — he's still enrolled (expected 2029). And no
+  // `worksFor`: every role listed on the site has an end date.
+  affiliation: { "@type": "CollegeOrUniversity", name: "University of Waterloo" },
   address: { "@type": "PostalAddress", addressLocality: "Waterloo", addressRegion: "ON", addressCountry: "CA" },
-  sameAs: [profile.github, profile.linkedin],
+  sameAs: [profile.github, profile.linkedin.replace("//linkedin", "//www.linkedin")],
 }
+
+/**
+ * Stamp the stored theme before first paint. Without this the server always
+ * renders phosphor and a visitor on another theme sees a flash of green.
+ */
+const themeScript = `try{var t=localStorage.getItem("theme");if(t&&["${THEMES.join('","')}"].indexOf(t)>-1)document.documentElement.setAttribute("data-theme",t)}catch(e){}`
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -104,8 +111,61 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className={`${mono.variable} ${sans.variable} font-mono antialiased`}>{children}</body>
+      <body className={`${mono.variable} ${sans.variable} font-mono antialiased`}>
+        {/*
+          The terminal renders client-side and the name is box-drawing glyphs, so
+          the pre-hydration HTML contained ~12 readable words and neither "Umar"
+          nor any employer. This is the same content the terminal serves, made
+          available to crawlers and screen readers.
+        */}
+        <div className="sr-only">
+          <h1>
+            {profile.name} — {profile.title}
+          </h1>
+          <p>{about.filter(Boolean).join(" ")}</p>
+          <h2>Experience</h2>
+          <ul>
+            {experience.map((job) => (
+              <li key={job.company}>
+                <strong>{job.company}</strong> — {job.role}, {job.period}, {job.location}.{" "}
+                {job.points.join(" ")}
+              </li>
+            ))}
+          </ul>
+          <h2>Education</h2>
+          <ul>
+            {education.map((e) => (
+              <li key={e.institution}>
+                {e.degree}, {e.institution}, {e.period}.
+              </li>
+            ))}
+          </ul>
+          <h2>Projects</h2>
+          <ul>
+            {projects.map((p) => (
+              <li key={p.slug}>
+                <strong>{p.name}</strong> ({p.year}) — {p.blurb} Built with {p.tech.join(", ")}.
+              </li>
+            ))}
+          </ul>
+          <h2>Skills</h2>
+          <ul>
+            {skills.map((s) => (
+              <li key={s.group}>
+                {s.group}: {s.items.join(", ")}.
+              </li>
+            ))}
+          </ul>
+          <h2>Contact</h2>
+          <p>
+            <a href={`mailto:${profile.email}`}>{profile.email}</a> ·{" "}
+            <a href={profile.github}>GitHub</a> · <a href={profile.linkedin}>LinkedIn</a>
+          </p>
+        </div>
+        {children}
+      </body>
     </html>
   )
 }

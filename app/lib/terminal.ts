@@ -28,7 +28,6 @@ export type Line =
   | { k: "tags"; items: string[] }
   | { k: "err"; t: string }
   | { k: "ok"; t: string }
-  | { k: "rule" }
 
 export type Entry = { input: string | null; lines: Line[] }
 
@@ -92,10 +91,10 @@ const HELP: { cmd: string; desc: string }[] = [
   { cmd: "clear", desc: "clear the screen  (ctrl+l)" },
 ]
 
-function projectLines(p: (typeof projects)[number], showDetail: boolean): Line[] {
+function projectLines(p: (typeof projects)[number]): Line[] {
   const out: Line[] = [sub(`${p.name}  ·  ${p.year}`), t(p.blurb)]
   if (p.award) out.push({ k: "ok", t: `★ ${p.award}` })
-  if (showDetail && p.detail) out.push(dim(p.detail))
+  if (p.detail) out.push(dim(p.detail))
   out.push({ k: "tags", items: p.tech })
   if (p.live) out.push(link("live demo", p.live))
   if (p.repo) out.push(link("source", p.repo))
@@ -104,14 +103,20 @@ function projectLines(p: (typeof projects)[number], showDetail: boolean): Line[]
 }
 
 function findProject(q: string) {
-  const n = q.toLowerCase().replace(/[^a-z0-9]/g, "")
-  return projects.find(
-    (p) =>
-      p.slug === q.toLowerCase() ||
-      p.slug.replace(/-/g, "") === n ||
-      p.name.toLowerCase().replace(/[^a-z0-9]/g, "") === n ||
-      p.name.toLowerCase().includes(q.toLowerCase()),
+  const ql = q.toLowerCase()
+  const n = ql.replace(/[^a-z0-9]/g, "")
+
+  // Exact matches win outright, so a later project's slug can't be beaten by an
+  // earlier project's name happening to contain it.
+  const exact = projects.find(
+    (p) => p.slug === ql || p.slug.replace(/-/g, "") === n || p.name.toLowerCase().replace(/[^a-z0-9]/g, "") === n,
   )
+  if (exact) return exact
+
+  // Substring matching needs enough characters to mean something — without this
+  // `open e` matched the first project with an "e" in its name.
+  if (ql.length < 3) return undefined
+  return projects.find((p) => p.name.toLowerCase().includes(ql) || p.slug.includes(ql))
 }
 
 export function welcome(): Line[] {
@@ -203,7 +208,7 @@ export function run(raw: string): CommandResult {
               : `${list.length} featured of ${projects.length}. Run \`projects --all\` for the rest.`,
           ),
           B,
-          ...list.flatMap((p) => projectLines(p, true)),
+          ...list.flatMap((p) => projectLines(p)),
         ],
       }
     }
@@ -355,7 +360,9 @@ export function run(raw: string): CommandResult {
     case "cat": {
       if (!arg) return { lines: [{ k: "err", t: "cat: missing operand" }, B] }
       if (arg === "resume.pdf" || arg === "resume") return run("resume")
-      if (COMMANDS.includes(arg.replace(/\.txt$/, ""))) return run(arg.replace(/\.txt$/, ""))
+      const READABLE = ["about", "now", "experience", "projects", "skills", "education", "awards", "contact", "languages", "interests"]
+      const file = arg.replace(/\.txt$/, "")
+      if (READABLE.includes(file)) return run(file)
       return { lines: [{ k: "err", t: `cat: ${arg}: no such file` }, B] }
     }
 
@@ -376,11 +383,11 @@ export function run(raw: string): CommandResult {
         sub(`${profile.handle}@darsot.ca`),
         dim("─".repeat(28)),
         kv("Role", profile.title),
-        kv("Company", experience[0].company),
+        kv("Recent", experience[0]?.company ?? "—"),
         kv("School", "University of Waterloo"),
         kv("Location", profile.location),
         kv("Projects", `${projects.length} public`),
-        kv("Languages", skills[0].items.slice(0, 4).join(", ")),
+        kv("Languages", skills[0]?.items.slice(0, 4).join(", ") ?? "—"),
         kv("Shell", "darsot-term 2.0"),
         kv("Uptime", "since 2005"),
       ]
@@ -398,27 +405,29 @@ export function run(raw: string): CommandResult {
     case "history":
       return { lines: [] } // handled by the component, which owns history state
 
-    case "echo":
-      return { lines: [t(arg), B] }
-
-    default:
+    default: {
+      const guess = didYouMean(cmd)
       return {
         lines: [
           { k: "err", t: `command not found: ${cmd}` },
-          dim(didYouMean(cmd) ? `Did you mean \`${didYouMean(cmd)}\`?` : "Type `help` to see what's available."),
+          dim(guess ? `Did you mean \`${guess}\`?` : "Type `help` to see what's available."),
           B,
         ],
       }
+    }
   }
 }
 
 /** Cheap edit-distance suggestion so typos are recoverable. */
 function didYouMean(input: string): string | null {
+  if (input.length < 2) return null
   let best: string | null = null
-  let bestScore = 3
+  // Scale tolerance to the word being matched, so a 1-char input doesn't
+  // "nearly match" every short command.
+  let bestScore = Infinity
   for (const c of COMMANDS) {
     const d = distance(input, c)
-    if (d < bestScore) {
+    if (d < bestScore && d <= Math.max(2, Math.ceil(c.length / 3))) {
       bestScore = d
       best = c
     }

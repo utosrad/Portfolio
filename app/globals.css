@@ -4,7 +4,7 @@
 
 /* ---------------------------------------------------------------
    Themes. Every colour on the site resolves through these vars, so
-   the `theme` command reskins the terminal and the doc view at once.
+   the `theme` command reskins the whole terminal at once.
    --------------------------------------------------------------- */
 :root,
 [data-theme="phosphor"] {
@@ -192,35 +192,11 @@ body {
   }
 }
 
-@keyframes boot-flicker {
-  0% {
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.6;
-  }
-  15% {
-    opacity: 0.2;
-  }
-  25% {
-    opacity: 1;
-  }
-  30% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
 .animate-fade-up {
   animation: fade-up 0.35s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
 .animate-fade-in {
   animation: fade-in 0.5s ease both;
-}
-.animate-boot {
-  animation: boot-flicker 0.9s ease-out both;
 }
 .cursor-blink {
   animation: blink 1.05s steps(1) infinite;
@@ -260,4 +236,28 @@ body {
     background-clip: border-box;
     color: var(--accent);
   }
+}
+
+/* Hide the horizontal scrollbar on the landing name row without disabling the
+   scroll itself. Must override the global `scrollbar-width: thin` above. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Server-rendered content for crawlers and screen readers. Visually removed,
+   but still in the accessibility tree — not `display:none`. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

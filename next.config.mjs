@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Types and lint now pass, so let a broken build actually fail the deploy.
+  // Type errors fail the build (the `typescript.ignoreBuildErrors` escape hatch
+  // is deliberately absent). Lint is left off the deploy path — `npm run lint`
+  // covers it locally.
   eslint: {
     ignoreDuringBuilds: true,
   },

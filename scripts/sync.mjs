@@ -7,8 +7,8 @@
  *
  * Claude reads both, merges them with the profile that's already on the site,
  * and returns a validated JSON object. Only the region between the SYNC:START
- * and SYNC:END markers is rewritten — philosophy, languages and interests are
- * hand-written and never touched.
+ * and SYNC:END markers is rewritten — languages and interests are hand-written
+ * and never touched.
  *
  *   node scripts/sync.mjs            # show the diff, write nothing
  *   node scripts/sync.mjs --write    # apply it
@@ -143,6 +143,7 @@ const SCHEMA = {
     about: { ...strArr, description: "Prose lines. An empty string is a paragraph break. Keep lines under ~95 chars." },
     experience: {
       type: "array",
+      minItems: 1,
       items: {
         type: "object",
         additionalProperties: false,
@@ -209,6 +210,7 @@ const SCHEMA = {
     },
     skills: {
       type: "array",
+      minItems: 1,
       items: {
         type: "object",
         additionalProperties: false,
@@ -349,11 +351,6 @@ ${END} ────────────────────────�
 /* ------------------------------------------------------------------ */
 
 async function main() {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.error("ANTHROPIC_API_KEY is not set.")
-    process.exit(1)
-  }
-
   const current = await fs.readFile(PROFILE, "utf8")
   const startAt = current.indexOf(START)
   const endAt = current.indexOf(END)
@@ -363,6 +360,10 @@ async function main() {
   }
   // Replace from START through the end of the END marker's own line.
   const endOfBlock = current.indexOf("\n", endAt)
+  if (endOfBlock === -1) {
+    console.error("The SYNC:END marker is the last line with no newline after it; refusing to splice.")
+    process.exit(1)
+  }
   const generatedNow = current.slice(startAt, endOfBlock)
 
   console.log("Reading resume…")
@@ -429,7 +430,11 @@ Return the updated profile data.`,
   const data = JSON.parse(text)
   const next = current.slice(0, startAt) + render(data) + current.slice(endOfBlock)
 
-  if (next === current) {
+  // render() emits JSON-ish formatting while the checked-in file is TS-styled, so
+  // a raw string compare always differs. Compare with whitespace and quoting
+  // normalised to detect a genuine no-op.
+  const norm = (x) => x.replace(/["'`]/g, '"').replace(/\s+/g, " ").replace(/,\s*([}\]])/g, "$1")
+  if (norm(next) === norm(current)) {
     console.log("Already up to date — nothing changed.")
     return
   }
@@ -449,7 +454,9 @@ Return the updated profile data.`,
     return
   }
 
-  await fs.writeFile(PROFILE, next)
+  // Write-then-rename so an interrupted run can't leave profile.ts truncated.
+  await fs.writeFile(PROFILE + ".tmp", next)
+  await fs.rename(PROFILE + ".tmp", PROFILE)
   console.log(`\nUpdated app/data/profile.ts. ${summary}`)
   console.log("Run `npm run build` before deploying.")
 }

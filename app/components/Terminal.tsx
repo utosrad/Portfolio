@@ -46,9 +46,6 @@ function LineView({ line }: { line: Line }) {
     case "blank":
       return <div className="h-3" />
 
-    case "rule":
-      return <div className="my-3 border-t" style={{ borderColor: "var(--border)" }} />
-
     case "head":
       return (
         <div
@@ -158,7 +155,6 @@ export default function Terminal({
   const [maximized, setMaximized] = useState(false)
 
   const inputRef = useRef<HTMLInputElement>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const prompt = `${profile.handle}@darsot.ca:~$`
@@ -266,6 +262,8 @@ export default function Terminal({
     if (e.ctrlKey && e.key.toLowerCase() === "l") {
       e.preventDefault()
       setEntries([])
+      setCandidates([])
+      setHistIdx(-1)
       return
     }
 
@@ -273,12 +271,15 @@ export default function Terminal({
       e.preventDefault()
       setEntries((en) => [...en, { input: input + "^C", lines: [] }])
       setInput("")
+      setCandidates([])
+      setHistIdx(-1)
       return
     }
 
     if (e.key === "Escape") {
       setCandidates([])
       setInput("")
+      setHistIdx(-1)
     }
   }
 
@@ -334,7 +335,6 @@ export default function Terminal({
 
         {/* Scrollback */}
         <div
-          ref={scrollRef}
           onClick={(e) => {
             // Don't steal focus when the user is selecting text or clicking a link
             if (window.getSelection()?.toString()) return
@@ -365,7 +365,10 @@ export default function Terminal({
                 <button
                   key={c}
                   onClick={() => {
-                    setInput(c)
+                    // Chips complete the last word — replacing the whole input
+                    // would drop the command an argument belongs to.
+                    const parts = input.split(/\s+/)
+                    setInput(parts.length > 1 ? [...parts.slice(0, -1), c].join(" ") : c)
                     setCandidates([])
                     inputRef.current?.focus()
                   }}

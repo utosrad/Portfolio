@@ -4,6 +4,20 @@
 // This file is also the write target of `npm run sync` — see scripts/sync.mjs,
 // which re-derives it from .resume/resume.pdf and the GitHub API.
 
+/**
+ * Whop's card and migration figures are unreleased internal metrics.
+ * Flip to "safe" to swap every one of them for non-proprietary phrasing
+ * without touching anything else on the site.
+ */
+export type MetricsMode = "exact" | "safe"
+
+// The `as MetricsMode` is load-bearing: without it TypeScript narrows this const
+// to its literal type and the comparison below becomes statically false, so
+// flipping the value would silently do nothing.
+export const metricsMode = "safe" as MetricsMode
+
+const pick = (exact: string, safe: string) => (metricsMode === "exact" ? exact : safe)
+
 // ─── SYNC:START ──────────────────────────────────────────────────────────────
 // Everything between these markers is rewritten by `npm run sync`, which
 // re-derives it from .resume/resume.pdf and the GitHub API. Hand-edits here are
@@ -27,7 +41,7 @@ export const profile = {
 export const now = {
   updated: "August 2026",
   items: [
-    "Back at Waterloo for the fall term.",
+    "Just wrapped a term at Whop; back at Waterloo in September.",
     "Building agent tooling — an MCP server that drives the iOS Simulator end to end.",
     "Chasing side projects that teach me something: delay contagion, forecast calibration.",
   ],
@@ -36,12 +50,16 @@ export const now = {
 export const about = [
   "I'm a software engineer and a math co-op student at Waterloo.",
   "",
-  "Most recently I led the mobile experience at Dapital, building a 0 to 1 iOS app in",
-  "Swift and UIKit along with the real-time data layer underneath it — live prices for",
-  "150+ pairs, and an interface that stays correct when things move fast.",
+  "Most recently I was at Whop on wallets and growth engineering, shipping a virtual card",
+  "program for creators and a migration funnel that reads a merchant's live fees to show",
+  "them what switching would save.",
   "",
-  "Before that: data and product work at Interac on the e-Transfer team, and document",
-  "automation at Purolator.",
+  "Before that I led the mobile experience at Dapital: a 0 to 1 iOS app in Swift and UIKit",
+  "plus the real-time data layer underneath it — live prices for 150+ pairs, and an",
+  "interface that stays correct when things move fast.",
+  "",
+  "Alongside Dapital, data and product work at Interac on the e-Transfer team. Before all",
+  "of it, document automation at Purolator.",
   "",
   "Outside of work I'm usually shipping something small and sharp — a flight delay model",
   "that took first at I4, an MCP server that lets an agent drive an iOS Simulator, a",
@@ -60,6 +78,29 @@ export type Job = {
 }
 
 export const experience: Job[] = [
+  {
+    role: "Software Engineer",
+    company: "Whop",
+    period: "May 2026 — Aug 2026",
+    location: "Palo Alto, CA",
+    note: "Wallets and growth engineering at a creator commerce platform",
+    points: [
+      pick(
+        "Shipped Whop Cards, a virtual card program for creators — issuance, spend limits and freeze/cancel flows in Rails and Postgres. Scaled to 23.5K cards issued, 15.8K active across 10.4K creators, and $25M in spend.",
+        "Shipped Whop Cards, a virtual card program for creators — issuance, spend limits and freeze/cancel flows in Rails and Postgres. Scaled to tens of thousands of cards across thousands of creators.",
+      ),
+      pick(
+        "Built the Stripe migration funnel: a page that reads a merchant's live Stripe fees to show what they'd save by switching, paired with automated card import so subscriptions kept billing. Drove $4.4M in migrated GMV on a $10K budget.",
+        "Built the Stripe migration funnel: a page that reads a merchant's live Stripe fees to show what they'd save by switching, paired with automated card import so subscriptions kept billing. Drove seven figures in migrated payment volume.",
+      ),
+      "Architected a Hyperliquid perpetual futures integration as a native Rails API resource, using non-custodial Privy embedded wallets, USDT collateral bridged via Plasma, and builder-code fee attribution.",
+      pick(
+        "Worked on Apple Pay and Google Pay express checkout, extended the checkout API with dynamic required/recommended action resolution, and instrumented the card application funnel across 68K application starts.",
+        "Worked on Apple Pay and Google Pay express checkout, extended the checkout API with dynamic required/recommended action resolution, and instrumented the card application funnel.",
+      ),
+    ],
+    stack: ["Ruby on Rails", "Postgres", "MySQL", "BigQuery", "Stripe API", "Privy", "Hyperliquid", "Metabase"],
+  },
   {
     role: "Software Engineer",
     company: "Dapital",
@@ -94,7 +135,6 @@ export const experience: Job[] = [
     points: [
       "Built a document automation platform in Python, Flask and spaCy to extract and validate structured information from 50+ weekly operational reports.",
       "Modernized legacy internal systems into containerized cloud-ready services with Docker and CI/CD, improving deployment reliability through automated testing.",
-      "Led data governance initiatives across the team.",
     ],
   },
 ]
@@ -133,7 +173,7 @@ export const projects: Project[] = [
     name: "Flight Delay Contagion",
     blurb: "Ranks flights by how much lateness they propagate downstream, not by how late they are.",
     detail:
-      "XGBoost delay model with epidemic network modelling and a MILP gate optimizer, visualised as a D3 contagion graph. Ships with the out-of-sample validation showing where the model stops generalizing.",
+      "XGBoost delay model with epidemic network modelling and a MILP gate optimizer, visualised as a D3 contagion graph. Ships with the out-of-sample validation showing the model does not generalize.",
     tech: ["XGBoost", "MILP", "D3.js", "Python"],
     repo: "https://github.com/utosrad/delay-contagion",
     year: "2026",
@@ -162,14 +202,25 @@ export const projects: Project[] = [
     featured: true,
   },
   {
+    slug: "whop-tasks",
+    name: "Whop Tasks",
+    blurb: "AI-verified task marketplace where an LLM grades proof of work before money moves.",
+    detail:
+      "Creators post paid tasks with proof requirements. An LLM grades worker submissions under a strict JSON schema, and approval writes payout, fee and budget rows to a demo ledger.",
+    tech: ["Next.js", "TypeScript", "Prisma", "Postgres"],
+    repo: "https://github.com/utosrad/whop-tasks-mvp",
+    live: "https://whop-tasks-mvp.vercel.app",
+    year: "2026",
+  },
+  {
     slug: "ufc",
     name: "UFC Fight Outcome Model",
-    blurb: "Ensemble classifiers trained on 5,000+ fights, behind a live prediction dashboard.",
+    blurb: "Scored against the closing betting line instead of against a coin flip.",
     detail:
-      "Random Forest, XGBoost and neural nets with cross-validation and ROC-AUC evaluation under class imbalance. 66% accuracy on title fights, tested through mid-2025. Deployed behind a Flask API with a real-time analytics dashboard.",
-    tech: ["scikit-learn", "XGBoost", "Flask", "Pandas"],
-    repo: "https://github.com/utosrad/UFC_Prediction_Model",
-    year: "2025",
+      "6,528 fights from 2010-2024. Gradient boosting beats the market on log loss, Brier and AUC and loses on accuracy; a bootstrap puts the edge at +0.0015 with a confidence interval that crosses zero. The honest answer is that it matches the line and doesn't beat it.",
+    tech: ["scikit-learn", "gradient boosting", "Python", "bootstrap CI"],
+    repo: "https://github.com/utosrad/ufc-fight-model",
+    year: "2026",
     featured: true,
   },
   {
@@ -212,10 +263,10 @@ export const projects: Project[] = [
   },
   {
     slug: "sentiment-bot",
-    name: "Market Intelligence Bot",
+    name: "Market Radar",
     blurb: "Scans Reddit, X, RedFlagDeals and news for Canadian fintech signals, then mails a digest.",
     tech: ["Python", "LLM pipeline", "Telegram API", "Railway"],
-    repo: "https://github.com/utosrad/teams-sentiment-bot",
+    repo: "https://github.com/utosrad/market-radar",
     year: "2026",
   },
   {
@@ -224,8 +275,17 @@ export const projects: Project[] = [
     blurb: "Screens 315 S&P 500 companies by ESG risk, sector and market cap.",
     tech: ["Python", "Streamlit", "Pandas"],
     repo: "https://github.com/utosrad/ESG-Investment-Screener",
-    live: "https://esg-investment-screener.streamlit.app/",
     year: "2025",
+  },
+  {
+    slug: "mnist",
+    name: "Number Recognizer",
+    blurb: "A digit recognizer that measures its preprocessing gap rather than reporting an accuracy.",
+    detail:
+      "26.81% on raw hand-drawn PNGs versus 95.69% once they get MNIST-style crop, scale and centre-of-mass centring. The interesting number is the distance between those two, not either one alone.",
+    tech: ["TensorFlow", "Keras", "Python"],
+    repo: "https://github.com/utosrad/Number-Recognizer",
+    year: "2026",
   },
   {
     slug: "churn",
@@ -249,8 +309,8 @@ export const skills: { group: string; items: string[] }[] = [
     items: ["Swift", "UIKit", "SwiftUI", "React", "Next.js", "Tailwind", "Docker", "CI/CD", "Railway", "Git", "Linux"],
   },
   {
-    group: "ML & Data",
-    items: ["PyTorch", "TensorFlow", "scikit-learn", "XGBoost", "spaCy", "NumPy", "Pandas", "LLM tooling", "MCP"],
+    group: "Fintech & ML",
+    items: ["Stripe", "Privy", "Hyperliquid", "USDT/Plasma", "Ledger reconciliation", "Card issuing", "XGBoost", "GPT-4", "NumPy", "Pandas", "spaCy"],
   },
 ]
 

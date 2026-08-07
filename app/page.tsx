@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Landing from "./components/Landing"
 import Terminal from "./components/Terminal"
-import type { Theme } from "./lib/terminal"
+import { THEMES, type Theme } from "./lib/terminal"
 
 type View = "landing" | "terminal"
 
@@ -14,8 +14,10 @@ export default function Page() {
 
   // Restore the visitor's theme, and honour ?view=terminal for direct links.
   useEffect(() => {
-    const saved = localStorage.getItem("theme") as Theme | null
-    if (saved) setTheme(saved)
+    // Validate rather than cast: a stale value from a removed theme would set
+    // data-theme to something with no matching CSS, and break the cycle button.
+    const saved = localStorage.getItem("theme")
+    if (saved && (THEMES as readonly string[]).includes(saved)) setTheme(saved as Theme)
 
     if (new URLSearchParams(window.location.search).get("view") === "terminal") {
       setView("terminal")
