@@ -34,3 +34,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+profile.synced.ts
+
+# resume source for `npm run sync` — never committed, never served
+.resume/

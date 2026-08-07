@@ -1,11 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  devIndicators: false,
+  // Types and lint now pass, so let a broken build actually fail the deploy.
   eslint: {
     ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
   },
   images: {
     unoptimized: true,

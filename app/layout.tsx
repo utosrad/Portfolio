@@ -1,38 +1,113 @@
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import type { Metadata, Viewport } from "next"
+import { JetBrains_Mono, Inter } from "next/font/google"
 import "./globals.css"
+import { profile } from "./data/profile"
 
-const inter = Inter({ subsets: ["latin"] })
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+})
+
+const sans = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+})
+
+const description =
+  "Umar Darsot — software engineer building payments and trading infrastructure. Most recently Whop, previously Dapital and Interac. Waterloo math co-op."
 
 export const metadata: Metadata = {
-  title: "darsot.ca",
-  description: "Interactive terminal portfolio showcasing machine learning and data science expertise",
+  metadataBase: new URL(profile.website),
+  title: {
+    default: `${profile.name} — ${profile.title}`,
+    template: `%s — ${profile.name}`,
+  },
+  description,
+  keywords: [
+    "Umar Darsot",
+    "software engineer",
+    "University of Waterloo",
+    "Dapital",
+    "Whop",
+    "Interac",
+    "payments",
+    "trading infrastructure",
+    "iOS",
+    "Swift",
+    "Ruby on Rails",
+    "portfolio",
+  ],
+  authors: [{ name: profile.name, url: profile.website }],
+  creator: profile.name,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: profile.website,
+    siteName: "darsot.ca",
+    title: `${profile.name} — ${profile.title}`,
+    description,
+    locale: "en_CA",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${profile.name} — ${profile.title}`,
+    description,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
   icons: {
     icon: [
       {
-        url: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='10' y='20' width='80' height='60' rx='5' fill='%2300ff00' stroke='%2300aa00' stroke-width='2'/><rect x='20' y='35' width='60' height='30' fill='%23000000'/><text x='50' y='55' text-anchor='middle' font-family='monospace' font-size='12' fill='%2300ff00'>$</text><circle cx='75' cy='25' r='3' fill='%23ff0000'/><circle cx='85' cy='25' r='3' fill='%23ffff00'/><circle cx='95' cy='25' r='3' fill='%2300ff00'/></svg>",
-        sizes: "any",
-        type: "image/svg+xml",
-      },
-    ],
-    apple: [
-      {
-        url: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='10' y='20' width='80' height='60' rx='5' fill='%2300ff00' stroke='%2300aa00' stroke-width='2'/><rect x='20' y='35' width='60' height='30' fill='%23000000'/><text x='50' y='55' text-anchor='middle' font-family='monospace' font-size='12' fill='%2300ff00'>$</text><circle cx='75' cy='25' r='3' fill='%23ff0000'/><circle cx='85' cy='25' r='3' fill='%23ffff00'/><circle cx='95' cy='25' r='3' fill='%2300ff00'/></svg>",
-        sizes: "180x180",
+        url:
+          "data:image/svg+xml," +
+          encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#07090b"/><text x="10" y="42" font-family="ui-monospace,monospace" font-size="30" font-weight="700" fill="#46e58a">&gt;_</text></svg>`,
+          ),
         type: "image/svg+xml",
       },
     ],
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#07090b" },
+    { media: "(prefers-color-scheme: light)", color: "#07090b" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+}
+
+/** Structured data so search engines resolve the site to a person, not a blob of ASCII. */
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: profile.name,
+  url: profile.website,
+  email: `mailto:${profile.email}`,
+  jobTitle: profile.title,
+  worksFor: { "@type": "Organization", name: "Whop" },
+  alumniOf: { "@type": "CollegeOrUniversity", name: "University of Waterloo" },
+  address: { "@type": "PostalAddress", addressLocality: "Waterloo", addressRegion: "ON", addressCountry: "CA" },
+  sameAs: [profile.github, profile.linkedin],
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" data-theme="phosphor" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
+      <body className={`${mono.variable} ${sans.variable} font-mono antialiased`}>{children}</body>
     </html>
   )
 }

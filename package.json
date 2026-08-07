@@ -1,14 +1,17 @@
 {
-  "name": "terminal-portfolio",
+  "name": "darsot-portfolio",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sync": "node scripts/sync.mjs",
+    "sync:write": "node scripts/sync.mjs --write"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
@@ -16,8 +19,7 @@
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^2.5.4",
-    "tailwindcss-animate": "^1.0.7",
-    "three": "^0.180.0"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "^20",
