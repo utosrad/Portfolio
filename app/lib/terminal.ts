@@ -9,7 +9,6 @@ import {
   skills,
   languages,
   interests,
-  philosophy,
 } from "../data/profile"
 
 /**
@@ -26,7 +25,6 @@ export type Line =
   | { k: "bullet"; t: string }
   | { k: "kv"; key: string; val: string }
   | { k: "link"; label: string; href: string; note?: string }
-  | { k: "quote"; t: string }
   | { k: "tags"; items: string[] }
   | { k: "err"; t: string }
   | { k: "ok"; t: string }
@@ -38,7 +36,7 @@ export type CommandResult = {
   lines?: Line[]
   clear?: boolean
   theme?: string
-  view?: "doc" | "landing"
+  view?: "landing"
   openUrl?: string
 }
 
@@ -66,11 +64,9 @@ export const COMMANDS = [
   "awards",
   "resume",
   "contact",
-  "philosophy",
   "languages",
   "interests",
   "neofetch",
-  "gui",
   "theme",
   "open",
   "clear",
@@ -89,12 +85,10 @@ const HELP: { cmd: string; desc: string }[] = [
   { cmd: "projects", desc: "things I've built (try: projects --all)" },
   { cmd: "skills", desc: "languages, frameworks, tools" },
   { cmd: "education", desc: "school and recognition" },
-  { cmd: "resume", desc: "download the PDF" },
+  { cmd: "resume", desc: "view my resume" },
   { cmd: "contact", desc: "how to reach me" },
-  { cmd: "philosophy", desc: "mindset · decisions · craft" },
   { cmd: "open <name>", desc: "open a project, repo or link" },
   { cmd: "theme <name>", desc: "phosphor · amber · ice · paper" },
-  { cmd: "gui", desc: "switch to the readable page view" },
   { cmd: "clear", desc: "clear the screen  (ctrl+l)" },
 ]
 
@@ -128,7 +122,7 @@ export function welcome(): Line[] {
     dim(profile.tagline),
     B,
     t("Type a command, or press Tab to autocomplete."),
-    dim("New here? Try `about`, `projects`, or `gui` for the readable version."),
+    dim("New here? Start with `about`, then `experience` or `projects`."),
     B,
   ]
 }
@@ -281,40 +275,6 @@ export function run(raw: string): CommandResult {
         ],
       }
 
-    case "philosophy": {
-      const key = arg.toLowerCase()
-      if (key && philosophy[key]) {
-        const p = philosophy[key]
-        return {
-          lines: [
-            head(p.title),
-            B,
-            ...p.body.map((l) =>
-              !l ? B : l.startsWith('"') ? ({ k: "quote", t: l } as Line) : t(l),
-            ),
-            B,
-          ],
-        }
-      }
-      return {
-        lines: [
-          head("Philosophy"),
-          B,
-          t("Three things I keep coming back to."),
-          B,
-          ...Object.entries(philosophy).map(([k, v]) => kv(k, v.title)),
-          B,
-          dim("Run `mindset`, `decisions` or `craft`."),
-          B,
-        ],
-      }
-    }
-
-    case "mindset":
-    case "decisions":
-    case "craft":
-      return run(`philosophy ${cmd}`)
-
     case "languages":
       return {
         lines: [head("Languages"), B, ...languages.map((l) => kv(l.name, l.level)), B],
@@ -343,10 +303,6 @@ export function run(raw: string): CommandResult {
       }
       return { theme: name, lines: [{ k: "ok", t: `Theme set to ${name}.` }, B] }
     }
-
-    case "gui":
-    case "view":
-      return { view: "doc" }
 
     case "exit":
     case "quit":
@@ -389,7 +345,7 @@ export function run(raw: string): CommandResult {
     case "ls": {
       return {
         lines: [
-          { k: "tags", items: ["about", "now", "experience", "projects", "skills", "education", "contact", "philosophy"] },
+          { k: "tags", items: ["about", "now", "experience", "projects", "skills", "education", "awards", "contact"] },
           dim("resume.pdf"),
           B,
         ],
@@ -494,7 +450,6 @@ export function complete(input: string): { completion: string; candidates: strin
     let pool: string[] = []
     if (base === "open") pool = [...projects.map((p) => p.slug), "github", "linkedin", "resume", "email"]
     else if (base === "theme") pool = [...THEMES]
-    else if (base === "philosophy") pool = Object.keys(philosophy)
     const cands = pool.filter((c) => c.startsWith(frag))
     if (!cands.length) return { completion: input, candidates: [] }
     const pre = commonPrefix(cands)

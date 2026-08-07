@@ -1,5 +1,5 @@
 // Single source of truth for every piece of content on the site.
-// Update this file and the terminal, the doc view and the metadata all follow.
+// Update this file and the terminal and the page metadata both follow.
 //
 // This file is also the write target of `npm run sync` — see scripts/sync.mjs,
 // which re-derives it from .resume/resume.pdf and the GitHub API.
@@ -321,52 +321,3 @@ export const interests = [
   "Stargazing & telescopes",
   "Fantasy sports analytics",
 ]
-
-export const philosophy: Record<string, { title: string; body: string[] }> = {
-  mindset: {
-    title: "Mindset",
-    body: [
-      "Belief is the first step toward transformation.",
-      "",
-      '"From nothing. To something. To everything."',
-      "",
-      "Every breakthrough begins as an idea before it exists in the world. But belief alone",
-      "isn't enough — you have to have the courage to declare it. Vision without expression",
-      "is potential left unrealized.",
-      "",
-      "Mindset is a cycle: see the possibility, voice it with conviction, believe it deeply,",
-      "and act until it's real. Not arrogance — alignment between your thoughts, your words",
-      "and your will.",
-    ],
-  },
-  decisions: {
-    title: "Decisions",
-    body: [
-      "Every decision is a reflection of who you're becoming.",
-      "",
-      "It isn't just choosing between options; it's aligning vision, voice and values. The",
-      "question worth asking is: which choice expands me? Which direction brings me closer",
-      "to the person I'm building?",
-      "",
-      "The best decisions aren't purely logical. They're intuitive, courageous and deliberate —",
-      "made from awareness rather than impulse. The people who thrive aren't the ones who",
-      "avoid risk; they're the ones who move toward momentum with clarity of purpose.",
-    ],
-  },
-  craft: {
-    title: "Craft",
-    body: [
-      "Craft is the quiet force behind every good thing that gets built.",
-      "",
-      "It isn't something you're born with. You build it, refine it and test it through",
-      "relentless consistency. Real mastery demands repetition, patience and the willingness",
-      "to fail forward.",
-      "",
-      '"Hard work beats talent when talent doesn\'t work hard."',
-      "",
-      "It's forged in the invisible hours — the late nights, the corrections, the small",
-      "improvements nobody sees. Talent opens the door; discipline keeps you in the room.",
-      "Over time craft stops being what you do and becomes who you are.",
-    ],
-  },
-}

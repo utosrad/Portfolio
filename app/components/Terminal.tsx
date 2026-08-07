@@ -72,16 +72,6 @@ function LineView({ line }: { line: Line }) {
     case "dim":
       return <div style={{ color: "var(--fg-dim)" }}>{linkify(line.t)}</div>
 
-    case "quote":
-      return (
-        <div
-          className="italic pl-3 border-l-2 my-1"
-          style={{ color: "var(--warn)", borderColor: "var(--accent-soft)" }}
-        >
-          {line.t}
-        </div>
-      )
-
     case "bullet":
       return (
         <div className="flex gap-2.5">
@@ -153,12 +143,10 @@ function LineView({ line }: { line: Line }) {
 
 export default function Terminal({
   onExit,
-  onGui,
   theme,
   setTheme,
 }: {
   onExit: () => void
-  onGui: () => void
   theme: Theme
   setTheme: (t: Theme) => void
 }) {
@@ -224,13 +212,12 @@ export default function Terminal({
         return
       }
       if (res.view === "landing") return onExit()
-      if (res.view === "doc") return onGui()
       if (res.theme) setTheme(res.theme as Theme)
       if (res.openUrl) window.open(res.openUrl, "_blank", "noopener,noreferrer")
 
       setEntries((e) => [...e, { input: cmd, lines: res.lines ?? [] }])
     },
-    [history, onExit, onGui, setTheme],
+    [history, onExit, setTheme],
   )
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -323,9 +310,9 @@ export default function Terminal({
               className="w-3 h-3 rounded-full bg-[#ff5f57] hover:brightness-125 transition"
             />
             <button
-              onClick={onGui}
-              aria-label="Switch to readable page view"
-              title="Readable view"
+              onClick={() => setEntries([])}
+              aria-label="Clear the terminal"
+              title="Clear"
               className="w-3 h-3 rounded-full bg-[#febc2e] hover:brightness-125 transition"
             />
             <button
@@ -343,13 +330,6 @@ export default function Terminal({
             {profile.handle}@darsot.ca — {entries.length} {entries.length === 1 ? "entry" : "entries"}
           </div>
 
-          <button
-            onClick={onGui}
-            className="text-xs px-2 py-1 rounded border hover:opacity-80 transition"
-            style={{ color: "var(--fg-dim)", borderColor: "var(--border)" }}
-          >
-            Readable view
-          </button>
         </div>
 
         {/* Scrollback */}
