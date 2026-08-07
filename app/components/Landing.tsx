@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { profile, experience } from "../data/profile"
+import { profile } from "../data/profile"
 
 /** "UMAR DARSOT" split per glyph so each can be animated and sounded. */
 const GLYPHS: { ch: string; art: string[] }[] = [
@@ -118,7 +118,7 @@ export default function Landing({ onEnter }: { onEnter: () => void }) {
       {/* Subtitle */}
       <div className="mt-7 text-center animate-fade-in" style={{ animationDelay: "0.5s" }}>
         <p className="font-mono text-sm sm:text-base" style={{ color: "var(--fg)" }}>
-          {profile.title} · {experience[0].company}
+          {profile.title}
         </p>
         <p className="font-mono text-xs sm:text-sm mt-1.5" style={{ color: "var(--fg-dim)" }}>
           {profile.tagline}
