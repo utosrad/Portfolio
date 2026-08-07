@@ -16,7 +16,7 @@ const sans = Inter({
 })
 
 const description =
-  "Umar Darsot — software engineer building payments and trading infrastructure. Most recently Whop, previously Dapital and Interac. Waterloo math co-op."
+  "Umar Darsot — software engineer and Waterloo math co-op student. Most recently Dapital, previously Interac and Purolator."
 
 export const metadata: Metadata = {
   metadataBase: new URL(profile.website),
@@ -30,13 +30,11 @@ export const metadata: Metadata = {
     "software engineer",
     "University of Waterloo",
     "Dapital",
-    "Whop",
     "Interac",
-    "payments",
-    "trading infrastructure",
     "iOS",
     "Swift",
-    "Ruby on Rails",
+    "TypeScript",
+    "machine learning",
     "portfolio",
   ],
   authors: [{ name: profile.name, url: profile.website }],
@@ -92,7 +90,7 @@ const jsonLd = {
   url: profile.website,
   email: `mailto:${profile.email}`,
   jobTitle: profile.title,
-  worksFor: { "@type": "Organization", name: "Whop" },
+  worksFor: { "@type": "Organization", name: "Dapital" },
   alumniOf: { "@type": "CollegeOrUniversity", name: "University of Waterloo" },
   address: { "@type": "PostalAddress", addressLocality: "Waterloo", addressRegion: "ON", addressCountry: "CA" },
   sameAs: [profile.github, profile.linkedin],

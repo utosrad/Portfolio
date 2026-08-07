@@ -4,20 +4,6 @@
 // This file is also the write target of `npm run sync` — see scripts/sync.mjs,
 // which re-derives it from .resume/resume.pdf and the GitHub API.
 
-/**
- * Whop's card and migration figures are unreleased internal metrics.
- * Flip to "safe" to swap every one of them for non-proprietary phrasing
- * without touching anything else on the site.
- */
-export type MetricsMode = "exact" | "safe"
-
-// The `as MetricsMode` is load-bearing: without it TypeScript narrows this const
-// to its literal type and the comparison below becomes statically false, so
-// flipping the value would silently do nothing.
-export const metricsMode = "safe" as MetricsMode
-
-const pick = (exact: string, safe: string) => (metricsMode === "exact" ? exact : safe)
-
 // ─── SYNC:START ──────────────────────────────────────────────────────────────
 // Everything between these markers is rewritten by `npm run sync`, which
 // re-derives it from .resume/resume.pdf and the GitHub API. Hand-edits here are
@@ -28,7 +14,7 @@ export const profile = {
   name: "Umar Darsot",
   handle: "umar",
   title: "Software Engineer",
-  tagline: "I build payments and trading infrastructure.",
+  tagline: "I build.",
   location: "Waterloo, ON",
   email: "udarsot@gmail.com",
   github: "https://github.com/utosrad",
@@ -41,20 +27,18 @@ export const profile = {
 export const now = {
   updated: "August 2026",
   items: [
-    "Wrapping up at Whop, where I shipped card issuing and a Stripe migration funnel.",
     "Back at Waterloo for the fall term.",
-    "Still building things at the edges of payments and markets — prediction-market pricing, agent tooling.",
+    "Building agent tooling — an MCP server that drives the iOS Simulator end to end.",
+    "Chasing side projects that teach me something: delay contagion, forecast calibration.",
   ],
 }
 
 export const about = [
-  "I'm a software engineer working on payments, trading, and the systems underneath both.",
+  "I'm a software engineer and a math co-op student at Waterloo.",
   "",
-  "At Whop I shipped Whop Cards, a virtual card program for creators, and built a Stripe",
-  "migration funnel that reads a merchant's live fees to show them what switching would",
-  "save. Before that I led the mobile trading experience at Dapital: a 0 to 1 iOS perpetual",
-  "futures platform on Hyperliquid — order entry, execution, portfolio updates, and the",
-  "real-time data layer holding it together.",
+  "Most recently I led the mobile experience at Dapital, building a 0 to 1 iOS app in",
+  "Swift and UIKit along with the real-time data layer underneath it — live prices for",
+  "150+ pairs, and an interface that stays correct when things move fast.",
   "",
   "Before that: data and product work at Interac on the e-Transfer team, and document",
   "automation at Purolator.",
@@ -76,29 +60,6 @@ export type Job = {
 }
 
 export const experience: Job[] = [
-  {
-    role: "Software Engineer",
-    company: "Whop",
-    period: "May 2026 — Aug 2026",
-    location: "Palo Alto, CA",
-    note: "Wallets and growth engineering at a creator commerce platform",
-    points: [
-      pick(
-        "Shipped Whop Cards, a virtual card program for creators — issuance, spend limits and freeze/cancel flows in Rails and Postgres. Scaled to 23.5K cards issued, 15.8K active across 10.4K creators, and $25M in spend.",
-        "Shipped Whop Cards, a virtual card program for creators — issuance, spend limits and freeze/cancel flows in Rails and Postgres. Scaled to tens of thousands of cards across thousands of creators.",
-      ),
-      pick(
-        "Built the Stripe migration funnel: a page that reads a merchant's live Stripe fees to show what they'd save by switching, paired with automated card import so subscriptions kept billing. Drove $4.4M in migrated GMV on a $10K budget.",
-        "Built the Stripe migration funnel: a page that reads a merchant's live Stripe fees to show what they'd save by switching, paired with automated card import so subscriptions kept billing. Drove seven figures in migrated payment volume.",
-      ),
-      "Architected a Hyperliquid perpetual futures integration as a native Rails API resource, using non-custodial Privy embedded wallets, USDT collateral bridged via Plasma, and builder-code fee attribution.",
-      pick(
-        "Worked on Apple Pay and Google Pay express checkout, extended the checkout API with dynamic required/recommended action resolution, and instrumented the card application funnel across 68K application starts.",
-        "Worked on Apple Pay and Google Pay express checkout, extended the checkout API with dynamic required/recommended action resolution, and instrumented the card application funnel.",
-      ),
-    ],
-    stack: ["Ruby on Rails", "Postgres", "MySQL", "BigQuery", "Stripe API", "Privy", "Hyperliquid", "Metabase"],
-  },
   {
     role: "Software Engineer",
     company: "Dapital",
@@ -222,17 +183,6 @@ export const projects: Project[] = [
     year: "2026",
   },
   {
-    slug: "whop-tasks",
-    name: "Whop Tasks",
-    blurb: "AI-verified task marketplace where an LLM grades proof of work before money moves.",
-    detail:
-      "Creators post paid tasks with proof requirements. An LLM grades worker submissions under a strict JSON schema, and approval writes payout, fee and budget rows to a demo ledger.",
-    tech: ["Next.js", "TypeScript", "Prisma", "Postgres"],
-    repo: "https://github.com/utosrad/whop-tasks-mvp",
-    live: "https://whop-tasks-mvp.vercel.app",
-    year: "2026",
-  },
-  {
     slug: "weather-edge",
     name: "Weather Edge",
     blurb: "Fair-value pricing and fractional Kelly sizing for Polymarket temperature markets.",
@@ -262,8 +212,8 @@ export const projects: Project[] = [
   },
   {
     slug: "sentiment-bot",
-    name: "Payments Market Intelligence",
-    blurb: "Scans Reddit, X, RedFlagDeals and news for Canadian payments signals, then mails a digest.",
+    name: "Market Intelligence Bot",
+    blurb: "Scans Reddit, X, RedFlagDeals and news for Canadian fintech signals, then mails a digest.",
     tech: ["Python", "LLM pipeline", "Telegram API", "Railway"],
     repo: "https://github.com/utosrad/teams-sentiment-bot",
     year: "2026",
@@ -299,8 +249,8 @@ export const skills: { group: string; items: string[] }[] = [
     items: ["Swift", "UIKit", "SwiftUI", "React", "Next.js", "Tailwind", "Docker", "CI/CD", "Railway", "Git", "Linux"],
   },
   {
-    group: "Fintech & ML",
-    items: ["Stripe", "Privy", "Hyperliquid", "USDT/Plasma", "Ledger reconciliation", "Card issuing", "XGBoost", "GPT-4", "NumPy", "Pandas", "spaCy"],
+    group: "ML & Data",
+    items: ["PyTorch", "TensorFlow", "scikit-learn", "XGBoost", "spaCy", "NumPy", "Pandas", "LLM tooling", "MCP"],
   },
 ]
 
