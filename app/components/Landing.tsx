@@ -50,6 +50,10 @@ export default function Landing({ onEnter }: { onEnter: () => void }) {
   // Enter / Space / click all get you in. No forced waiting.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Don't swallow the keypress when a control has focus — Enter on the sound
+      // toggle should toggle sound, not enter the terminal.
+      const el = e.target as HTMLElement | null
+      if (el && el.closest("button, a, input, textarea, select, [contenteditable]")) return
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault()
         onEnter()
@@ -93,7 +97,7 @@ export default function Landing({ onEnter }: { onEnter: () => void }) {
       style={{ background: "var(--bg)" }}
     >
       {/* Name */}
-      <div className="w-full max-w-5xl overflow-x-auto no-scrollbar">
+      <div aria-hidden className="w-full max-w-5xl overflow-x-auto no-scrollbar">
         <div className="flex justify-center gap-[2px] sm:gap-1 min-w-min mx-auto font-mono">
           {GLYPHS.slice(0, revealed).map((g, i) => (
             <div

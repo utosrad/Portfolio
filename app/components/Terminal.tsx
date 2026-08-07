@@ -69,6 +69,14 @@ function LineView({ line }: { line: Line }) {
     case "dim":
       return <div style={{ color: "var(--fg-dim)" }}>{linkify(line.t)}</div>
 
+    // Preformatted: HTML collapses runs of spaces, which flattened ASCII art.
+    case "pre":
+      return (
+        <div className="whitespace-pre leading-tight" style={{ color: "var(--fg-dim)" }}>
+          {line.t}
+        </div>
+      )
+
     case "bullet":
       return (
         <div className="flex gap-2.5">
@@ -209,7 +217,11 @@ export default function Terminal({
       }
       if (res.view === "landing") return onExit()
       if (res.theme) setTheme(res.theme as Theme)
-      if (res.openUrl) window.open(res.openUrl, "_blank", "noopener,noreferrer")
+      if (res.openUrl) {
+        // mailto: hands off to the mail client; window.open would strand a blank tab.
+        if (res.openUrl.startsWith("mailto:")) window.location.href = res.openUrl
+        else window.open(res.openUrl, "_blank", "noopener,noreferrer")
+      }
 
       setEntries((e) => [...e, { input: cmd, lines: res.lines ?? [] }])
     },
@@ -308,20 +320,20 @@ export default function Terminal({
               onClick={onExit}
               aria-label="Back to landing page"
               title="Back to landing"
-              className="w-3 h-3 rounded-full bg-[#ff5f57] hover:brightness-125 transition"
-            />
+              className="w-6 h-6 -m-1.5 grid place-items-center rounded-full group"
+            ><span aria-hidden className="w-3 h-3 rounded-full bg-[#ff5f57] group-hover:brightness-125 transition" /></button>
             <button
               onClick={() => setEntries([])}
               aria-label="Clear the terminal"
               title="Clear"
-              className="w-3 h-3 rounded-full bg-[#febc2e] hover:brightness-125 transition"
-            />
+              className="w-6 h-6 -m-1.5 grid place-items-center rounded-full group"
+            ><span aria-hidden className="w-3 h-3 rounded-full bg-[#febc2e] group-hover:brightness-125 transition" /></button>
             <button
               onClick={() => setMaximized((m) => !m)}
               aria-label="Toggle wide layout"
               title="Toggle width"
-              className="w-3 h-3 rounded-full bg-[#28c840] hover:brightness-125 transition"
-            />
+              className="w-6 h-6 -m-1.5 grid place-items-center rounded-full group"
+            ><span aria-hidden className="w-3 h-3 rounded-full bg-[#28c840] group-hover:brightness-125 transition" /></button>
           </div>
 
           <div
@@ -341,6 +353,9 @@ export default function Terminal({
             if ((e.target as HTMLElement).closest("a,button")) return
             inputRef.current?.focus()
           }}
+          role="log"
+          aria-live="polite"
+          aria-label="Terminal output"
           className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-4 font-mono text-[13px] sm:text-sm leading-relaxed cursor-text"
         >
           {entries.map((entry, i) => (

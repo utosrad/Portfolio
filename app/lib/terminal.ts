@@ -20,6 +20,7 @@ export type Line =
   | { k: "blank" }
   | { k: "text"; t: string }
   | { k: "dim"; t: string }
+  | { k: "pre"; t: string }
   | { k: "head"; t: string }
   | { k: "sub"; t: string }
   | { k: "bullet"; t: string }
@@ -68,6 +69,7 @@ export const COMMANDS = [
   "neofetch",
   "theme",
   "open",
+  "welcome",
   "clear",
   "history",
   "whoami",
@@ -83,12 +85,18 @@ const HELP: { cmd: string; desc: string }[] = [
   { cmd: "experience", desc: "where I've worked" },
   { cmd: "projects", desc: "things I've built (try: projects --all)" },
   { cmd: "skills", desc: "languages, frameworks, tools" },
-  { cmd: "education", desc: "school and recognition" },
+  { cmd: "education", desc: "school" },
+  { cmd: "awards", desc: "recognition" },
   { cmd: "resume", desc: "view my resume" },
   { cmd: "contact", desc: "how to reach me" },
   { cmd: "open <name>", desc: "open a project, repo or link" },
   { cmd: "theme <name>", desc: "phosphor · amber · ice · paper" },
+  { cmd: "languages", desc: "languages I speak" },
+  { cmd: "interests", desc: "what I do outside work" },
+  { cmd: "neofetch", desc: "the usual" },
   { cmd: "clear", desc: "clear the screen  (ctrl+l)" },
+  { cmd: "welcome", desc: "show the intro banner again" },
+  { cmd: "exit", desc: "back to the landing page" },
 ]
 
 function projectLines(p: (typeof projects)[number]): Line[] {
@@ -159,6 +167,10 @@ export function run(raw: string): CommandResult {
     case "clear":
     case "cls":
       return { clear: true }
+
+    case "welcome":
+    case "banner":
+      return { lines: welcome() }
 
     case "about":
     case "bio":
@@ -326,7 +338,7 @@ export function run(raw: string): CommandResult {
         site: profile.website,
       }
       const key = arg.toLowerCase()
-      if (shortcuts[key]) return { openUrl: shortcuts[key], lines: [{ k: "ok", t: `Opening ${key}…` }, B] }
+      if (shortcuts[key]) return { openUrl: shortcuts[key], lines: [{ k: "ok", t: `Opening ${shortcuts[key]}…` }, B] }
 
       const p = findProject(arg)
       if (p) {
@@ -359,9 +371,8 @@ export function run(raw: string): CommandResult {
 
     case "cat": {
       if (!arg) return { lines: [{ k: "err", t: "cat: missing operand" }, B] }
-      if (arg === "resume.pdf" || arg === "resume") return run("resume")
-      const READABLE = ["about", "now", "experience", "projects", "skills", "education", "awards", "contact", "languages", "interests"]
-      const file = arg.replace(/\.txt$/, "")
+      const READABLE = ["about", "now", "experience", "projects", "skills", "education", "awards", "contact", "languages", "interests", "resume"]
+      const file = arg.replace(/\.(txt|pdf|md)$/, "").toLowerCase()
       if (READABLE.includes(file)) return run(file)
       return { lines: [{ k: "err", t: `cat: ${arg}: no such file` }, B] }
     }
@@ -391,7 +402,7 @@ export function run(raw: string): CommandResult {
         kv("Shell", "darsot-term 2.0"),
         kv("Uptime", "since 2005"),
       ]
-      return { lines: [B, ...art.map((a) => dim(a)), B, ...info, B] }
+      return { lines: [B, ...art.map((a): Line => ({ k: "pre", t: a })), B, ...info, B] }
     }
 
     case "sudo":
